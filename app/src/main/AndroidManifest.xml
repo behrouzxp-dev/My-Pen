@@ -6,7 +6,7 @@
 
     <application
         android:name=".MyPenApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@drawable/ic_insulin_pen"
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_insulin_pen"
