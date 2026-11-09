@@ -96,7 +96,7 @@ fun SettingsScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
             border = BorderStroke(1.dp, DividerColor),
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
         ) {
@@ -169,7 +169,7 @@ fun SettingsScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
             border = BorderStroke(1.dp, DividerColor),
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
         ) {
@@ -237,7 +237,7 @@ fun SettingsScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
             border = BorderStroke(1.dp, DividerColor),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {

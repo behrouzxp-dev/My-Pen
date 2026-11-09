@@ -92,7 +92,7 @@ fun HistoryScreen(
                             .fillMaxWidth()
                             .clickable { onEventClicked(event.penId) },
                         shape = RoundedCornerShape(10.dp),
-                        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
                         border = BorderStroke(1.dp, DividerColor),
                         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                     ) {

@@ -35,8 +35,9 @@ import com.mypen.app.model.NotificationSettings
 import com.mypen.app.notification.NotificationHelper
 import com.mypen.app.ui.screens.*
 import com.mypen.app.ui.theme.MyPenTheme
+import com.mypen.app.ui.theme.OnPrimaryColor
 import com.mypen.app.ui.theme.PrimaryBlue
-import com.mypen.app.ui.theme.SurfaceWhite
+import com.mypen.app.ui.theme.SurfaceDark
 import com.mypen.app.util.DateUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -283,7 +284,7 @@ fun AppContent(
                             NavigationTab.HISTORY -> stringResource(R.string.nav_history)
                             NavigationTab.SETTINGS -> stringResource(R.string.nav_settings)
                         },
-                        color = SurfaceWhite,
+                        color = OnPrimaryColor,
                         fontSize = 18.sp
                     )
                 },
@@ -291,7 +292,7 @@ fun AppContent(
             )
         },
         bottomBar = {
-            NavigationBar(containerColor = SurfaceWhite) {
+            NavigationBar(containerColor = SurfaceDark) {
                 NavigationBarItem(
                     selected = currentTab == NavigationTab.DASHBOARD,
                     onClick = { currentTab = NavigationTab.DASHBOARD },
@@ -300,7 +301,7 @@ fun AppContent(
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = PrimaryBlue,
                         selectedTextColor = PrimaryBlue,
-                        indicatorColor = PrimaryBlue.copy(alpha = 0.1f)
+                        indicatorColor = PrimaryBlue.copy(alpha = 0.18f)
                     )
                 )
                 NavigationBarItem(
@@ -311,7 +312,7 @@ fun AppContent(
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = PrimaryBlue,
                         selectedTextColor = PrimaryBlue,
-                        indicatorColor = PrimaryBlue.copy(alpha = 0.1f)
+                        indicatorColor = PrimaryBlue.copy(alpha = 0.18f)
                     )
                 )
                 NavigationBarItem(
@@ -322,7 +323,7 @@ fun AppContent(
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = PrimaryBlue,
                         selectedTextColor = PrimaryBlue,
-                        indicatorColor = PrimaryBlue.copy(alpha = 0.1f)
+                        indicatorColor = PrimaryBlue.copy(alpha = 0.18f)
                     )
                 )
                 NavigationBarItem(
@@ -333,7 +334,7 @@ fun AppContent(
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = PrimaryBlue,
                         selectedTextColor = PrimaryBlue,
-                        indicatorColor = PrimaryBlue.copy(alpha = 0.1f)
+                        indicatorColor = PrimaryBlue.copy(alpha = 0.18f)
                     )
                 )
             }

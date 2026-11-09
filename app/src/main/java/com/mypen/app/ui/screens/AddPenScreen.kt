@@ -54,10 +54,10 @@ fun AddPenScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(R.string.add_pen_title), color = SurfaceWhite, fontSize = 18.sp) },
+                title = { Text(text = stringResource(R.string.add_pen_title), color = OnPrimaryColor, fontSize = 18.sp) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowForward, contentDescription = "بازگشت", tint = SurfaceWhite)
+                        Icon(Icons.Default.ArrowForward, contentDescription = "بازگشت", tint = OnPrimaryColor)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = PrimaryBlue)
@@ -75,7 +75,7 @@ fun AddPenScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
                 border = BorderStroke(1.dp, DividerColor),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
@@ -246,7 +246,7 @@ fun AddPenScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
                     ) {
                         if (isSaving) {
-                            CircularProgressIndicator(color = SurfaceWhite, modifier = Modifier.size(22.dp))
+                            CircularProgressIndicator(color = OnPrimaryColor, modifier = Modifier.size(22.dp))
                         } else {
                             Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))

@@ -37,7 +37,7 @@ fun DashboardScreen(
             FloatingActionButton(
                 onClick = onNavigateToAddPen,
                 containerColor = PrimaryBlue,
-                contentColor = SurfaceWhite
+                contentColor = OnPrimaryColor
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.btn_add_pen))
             }
@@ -94,7 +94,7 @@ fun DashboardScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
                 border = BorderStroke(1.dp, DividerColor),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
@@ -136,7 +136,7 @@ fun DashboardScreen(
                         .weight(1f)
                         .clickable { onNavigateToInventory(InsulinType.LONG_ACTING) },
                     shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceDark),
                     border = BorderStroke(1.5.dp, TypeLongActing),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
@@ -174,7 +174,7 @@ fun DashboardScreen(
                         .weight(1f)
                         .clickable { onNavigateToInventory(InsulinType.SHORT_ACTING) },
                     shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceDark),
                     border = BorderStroke(1.5.dp, TypeShortActing),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
@@ -218,7 +218,7 @@ fun DashboardScreen(
                         .weight(1f)
                         .clickable { onNavigateToInventory(InsulinType.LONG_ACTING) },
                     shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceDark),
                     border = BorderStroke(1.5.dp, StatusExpiringSoon),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
@@ -257,7 +257,7 @@ fun DashboardScreen(
                         .weight(1f)
                         .clickable { onNavigateToExpired() },
                     shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceDark),
                     border = BorderStroke(1.5.dp, StatusExpired),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {

@@ -39,7 +39,7 @@ fun InventoryScreen(
             FloatingActionButton(
                 onClick = onNavigateToAddPen,
                 containerColor = PrimaryBlue,
-                contentColor = SurfaceWhite
+                contentColor = OnPrimaryColor
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.btn_add_pen))
             }
@@ -53,7 +53,7 @@ fun InventoryScreen(
             // Tab Row
             TabRow(
                 selectedTabIndex = if (currentType == InsulinType.LONG_ACTING) 0 else 1,
-                containerColor = SurfaceWhite,
+                containerColor = SurfaceDark,
                 contentColor = PrimaryBlue
             ) {
                 Tab(

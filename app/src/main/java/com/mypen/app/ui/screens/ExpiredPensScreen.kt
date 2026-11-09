@@ -32,10 +32,10 @@ fun ExpiredPensScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.expired_pens_title), color = SurfaceWhite, fontSize = 18.sp) },
+                title = { Text(stringResource(R.string.expired_pens_title), color = OnPrimaryColor, fontSize = 18.sp) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowForward, contentDescription = "بازگشت", tint = SurfaceWhite)
+                        Icon(Icons.Default.ArrowForward, contentDescription = "بازگشت", tint = OnPrimaryColor)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = StatusExpired)
@@ -71,7 +71,7 @@ fun ExpiredPensScreen(
                             .fillMaxWidth()
                             .clickable { onPenSelected(pen) },
                         shape = RoundedCornerShape(10.dp),
-                        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
                         border = BorderStroke(1.dp, DividerColor),
                         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                     ) {
