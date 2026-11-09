@@ -72,11 +72,20 @@ Semantic Versioning as `MAJOR.MINOR.PATCH`:
 - `2.0.0` — incompatible changes
 
 `versionName` in `app/build.gradle.kts` must match the tag (without the `v`).
-`versionCode` is an integer that must never decrease; it is currently `1000`
+`versionCode` is an integer that must never decrease; it is currently `1100`
 and intentionally independent of `versionName`.
 
 ## Release history
 
+- **v1.1.0** — UI/UX overhaul (2026-11-09). Design-system layer with a static
+  dark theme and Vazirmatn typography; Jalali dates with Persian digits and a
+  Jalali picker; `navigation-compose` graph with animated transitions and
+  notification deep links; redesigned dashboard, inventory (search, sorting,
+  shelf-life bars), history timeline and settings; snackbars with actions
+  instead of toasts; edge-to-edge with a branded splash; home screen widget;
+  actionable notifications; R8 with resource shrinking. Database schema and
+  backup format unchanged (`schemaVersion: 1`); versionCode 1100. Published
+  directly by `release.yml` as `My Pen V1.1.0.apk` with its SHA-256 checksum.
 - **v1.0.0** — first stable release (2026-11-09). applicationId
   `com.mypen.app` (renamed from `com.arena.mypen` before the first stable
   release); versionCode 1000. Published directly by `release.yml` as

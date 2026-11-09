@@ -29,8 +29,8 @@ android {
         applicationId = "com.mypen.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1000
-        versionName = "1.0.0"
+        versionCode = 1100
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

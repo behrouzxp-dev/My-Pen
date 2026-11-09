@@ -183,7 +183,7 @@ inline "opened" action of expiry notifications.
 - `OPENED` pens past expiry transition to `EXPIRED` (as of the audit fixes);
   `DEFECTIVE` pens never auto-transition.
 - Backup notification logs are not preserved across restore.
-- `versionCode = 1000`, `versionName = "1.0.0"`; versioning is documented in
+- `versionCode = 1100`, `versionName = "1.1.0"`; versioning is documented in
   RELEASES.md.
 - Persian is the only supported UI locale; strings live in
   `res/values/strings.xml`, static dark theme colors in `ui/theme/Color.kt`,
