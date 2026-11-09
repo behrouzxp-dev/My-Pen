@@ -10,6 +10,8 @@ local.properties
 *.jks
 *.keystore
 key/
+key.properties
+secrets.properties
 
 # OS / editor
 .DS_Store

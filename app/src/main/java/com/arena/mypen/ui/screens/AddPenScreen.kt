@@ -1,6 +1,7 @@
 package com.arena.mypen.ui.screens
 
 import android.app.DatePickerDialog
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -32,9 +33,13 @@ import java.util.Locale
 @Composable
 fun AddPenScreen(
     onNavigateBack: () -> Unit,
-    onSavePens: (name: String, type: InsulinType, expiry: String, count: Int, onSuccess: () -> Unit) -> Unit
+    onSavePens: (name: String, type: InsulinType, expiry: String, count: Int, onSuccess: () -> Unit, onError: (String) -> Unit) -> Unit
 ) {
     val context = LocalContext.current
+    val errEmptyName = stringResource(R.string.err_empty_name)
+    val errInvalidDate = stringResource(R.string.err_invalid_date)
+    val errInvalidCount = stringResource(R.string.err_invalid_count)
+    val errCountTooLarge = stringResource(R.string.err_count_too_large)
 
     var name by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf(InsulinType.LONG_ACTING) }
@@ -193,31 +198,44 @@ fun AddPenScreen(
                         onClick = {
                             var hasError = false
                             if (name.trim().isEmpty()) {
-                                nameError = "لطفاً نام انسولین را وارد نمایید."
+                                nameError = errEmptyName
                                 hasError = true
                             }
                             if (!DateUtils.isValidDate(expiryDate.trim())) {
-                                expiryError = "لطفاً تاریخ معتبر با قالب YYYY-MM-DD وارد نمایید."
+                                expiryError = errInvalidDate
                                 hasError = true
                             }
                             val count = countStr.toIntOrNull()
                             if (count == null || count <= 0) {
-                                countError = "تعداد قلم‌ها باید یک عدد صحیح بزرگ‌تر از صفر باشد."
+                                countError = errInvalidCount
+                                hasError = true
+                            } else if (count > 100) {
+                                countError = errCountTooLarge
                                 hasError = true
                             }
 
                             if (!hasError && !isSaving && count != null) {
                                 isSaving = true
-                                onSavePens(name.trim(), selectedType, expiryDate.trim(), count) {
-                                    isSaving = false
-                                    // Reset form for next entry
-                                    name = ""
-                                    expiryDate = ""
-                                    countStr = "1"
-                                    nameError = null
-                                    expiryError = null
-                                    countError = null
-                                }
+                                onSavePens(
+                                    name.trim(),
+                                    selectedType,
+                                    expiryDate.trim(),
+                                    count,
+                                    {
+                                        isSaving = false
+                                        // Reset form for next entry
+                                        name = ""
+                                        expiryDate = ""
+                                        countStr = "1"
+                                        nameError = null
+                                        expiryError = null
+                                        countError = null
+                                    },
+                                    { message ->
+                                        isSaving = false
+                                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                                    }
+                                )
                             }
                         },
                         enabled = !isSaving,

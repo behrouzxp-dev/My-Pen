@@ -16,37 +16,41 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
-import java.io.File
 import java.util.UUID
 
+/**
+ * Compatibility and robustness tests for the backup format and core domain logic.
+ * The v0 backup fixture lives at app/src/test/resources/sample_insulin_backup.json
+ * so the suite is fully hermetic (no machine-specific paths).
+ */
 class MyPenCompatibilityTest {
 
     // ==========================================
-    // ۱. آزمون سازگاری واقعی فایل پشتیبان نسخه قبلی (v0)
+    // 1. Compatibility with a real v0 backup file
     // ==========================================
 
     @Test
     fun testPreviousVersionBackupFileCompatibility() {
-        val backupFile = File("/home/user/My Pen/releases/v0/sample_insulin_backup.json")
-        assertTrue("فایل پشتیبان نسخه قبلی باید موجود باشد", backupFile.exists())
+        val fixtureStream = javaClass.getResourceAsStream("/sample_insulin_backup.json")
+        assertNotNull("v0 backup fixture must be on the test classpath", fixtureStream)
 
-        val jsonContent = backupFile.readText(Charsets.UTF_8)
+        val jsonContent = fixtureStream!!.bufferedReader(Charsets.UTF_8).readText()
         assertNotNull(jsonContent)
 
         val root = JSONObject(jsonContent)
-        assertEquals("شماره نسخه قالب پشتیبان باید ۱ باشد", 1, root.getInt("schemaVersion"))
+        assertEquals("Backup schema version must be 1", 1, root.getInt("schemaVersion"))
         assertEquals("2026-10-18 10:00:00", root.getString("exportedAt"))
 
-        // اعتبارسنجی تنظیمات اعلان
+        // Notification settings exported by the previous version
         val settingsObj = root.getJSONObject("notificationSettings")
         val settings = NotificationSettings.fromJsonObject(settingsObj)
-        assertTrue("اعلان ۳۰ روز باید فعال باشد", settings.notify30Days)
-        assertTrue("اعلان ۱۴ روز باید فعال باشد", settings.notify14Days)
-        assertTrue("اعلان ۷ روز باید فعال باشد", settings.notify7Days)
+        assertTrue("30-day notification must be enabled", settings.notify30Days)
+        assertTrue("14-day notification must be enabled", settings.notify14Days)
+        assertTrue("7-day notification must be enabled", settings.notify7Days)
 
-        // اعتبارسنجی قلم‌های صادرشده نسخه قبلی
+        // Pens exported by the previous version
         val pensArray = root.getJSONArray("pens")
-        assertEquals("تعداد قلم‌های صادرشده در نسخه قبلی ۸ قلم است", 8, pensArray.length())
+        assertEquals("The v0 export contains 8 pens", 8, pensArray.length())
 
         val restoredPens = mutableListOf<InsulinPen>()
         for (i in 0 until pensArray.length()) {
@@ -54,11 +58,11 @@ class MyPenCompatibilityTest {
             restoredPens.add(pen)
         }
 
-        // بررسی یکتایی شناسه‌ها
+        // IDs must be unique
         val uniqueIds = restoredPens.map { it.id }.toSet()
         assertEquals(8, uniqueIds.size)
 
-        // بررسی جزئیات قلم‌های خاص (بلنداثر، کوتاه‌اثر، بازشده، معیوب، منقضی)
+        // Spot-check specific pens (long-acting, short-acting, opened, defective, expired)
         val pen1 = restoredPens.first { it.id == "e1a9501a-8b20-4a74-9f21-72a50a7c0001" }
         assertEquals("Lantus SoloStar", pen1.name)
         assertEquals(InsulinType.LONG_ACTING, pen1.type)
@@ -80,9 +84,9 @@ class MyPenCompatibilityTest {
         assertEquals(PenStatus.EXPIRED, pen8.status)
         assertEquals("2026-10-10", pen8.expiryDate)
 
-        // اعتبارسنجی تاریخچه رویدادها
+        // Events exported by the previous version
         val eventsArray = root.getJSONArray("events")
-        assertEquals("تعداد رویدادهای صادرشده نسخه قبلی ۱۱ رویداد است", 11, eventsArray.length())
+        assertEquals("The v0 export contains 11 events", 11, eventsArray.length())
 
         val restoredEvents = mutableListOf<HistoryEvent>()
         for (i in 0 until eventsArray.length()) {
@@ -90,57 +94,57 @@ class MyPenCompatibilityTest {
             restoredEvents.add(ev)
         }
 
-        // بررسی رویداد باز شدن قلم شماره ۶
+        // OPENED event for pen #6
         val openEvent = restoredEvents.first { it.penId == pen6.id && it.eventType == EventType.OPENED }
         assertEquals("2026-10-18", openEvent.eventDate)
         assertTrue(openEvent.description.contains("باز شدن قلم انسولین"))
 
-        // بررسی رویداد خرابی قلم شماره ۷ با متن فارسی
+        // DEFECTIVE event for pen #7 with its Persian description preserved
         val defectEvent = restoredEvents.first { it.penId == pen7.id && it.eventType == EventType.DEFECTIVE }
         assertTrue(defectEvent.description.contains("تغییر شفافیت مایع انسولین"))
     }
 
     // ==========================================
-    // ۲. آزمون واکنش به فایل‌های نامعتبر، ناقص و نسخه ناشناخته
+    // 2. Rejection of invalid, corrupt, and unknown-version backups
     // ==========================================
 
     @Test
     fun testInvalidAndCorruptBackupRejection() {
-        // ۱. رد فایل خالی
+        // 1. Reject an empty file
         try {
             val emptyJson = ""
             require(emptyJson.isNotBlank())
-            fail("باید فایل خالی را رد کند")
+            fail("An empty file must be rejected")
         } catch (e: IllegalArgumentException) {
             assertTrue(e.message != null)
         }
 
-        // ۲. رد نسخه قالب ناشناخته
+        // 2. Reject an unknown backup schema version (99)
         val incompatibleJson = """{"schemaVersion": 99, "pens": [], "events": []}"""
         try {
             val root = JSONObject(incompatibleJson)
             val v = root.optInt("schemaVersion", -1)
             if (v != 1) throw IllegalArgumentException("Unsupported schema: $v")
-            fail("باید نسخه ناشناخته ۹۹ را رد کند")
+            fail("Schema version 99 must be rejected")
         } catch (e: IllegalArgumentException) {
             assertTrue(e.message!!.contains("Unsupported schema"))
         }
 
-        // ۳. رد فایل ناقص (فاقد بخش pens یا events)
+        // 3. Reject a backup missing required sections (no "events")
         val missingSectionsJson = """{"schemaVersion": 1, "pens": []}"""
         try {
             val root = JSONObject(missingSectionsJson)
             if (!root.has("pens") || !root.has("events")) {
                 throw IllegalArgumentException("Missing required sections")
             }
-            fail("باید فایل فاقد events را رد کند")
+            fail("A backup without events must be rejected")
         } catch (e: IllegalArgumentException) {
             assertTrue(e.message!!.contains("Missing required sections"))
         }
     }
 
     // ==========================================
-    // ۳. آزمون اولویت‌بندی مصرف و برابری تاریخ‌های یکسان
+    // 3. Consumption priority ranking and equal expiry dates
     // ==========================================
 
     @Test
@@ -149,34 +153,34 @@ class MyPenCompatibilityTest {
         val pens = mutableListOf(
             InsulinPen(id = "1", name = "Pen A", type = InsulinType.LONG_ACTING, expiryDate = "2026-11-10"),
             InsulinPen(id = "2", name = "Pen B", type = InsulinType.LONG_ACTING, expiryDate = "2026-10-25"),
-            InsulinPen(id = "3", name = "Pen C", type = InsulinType.LONG_ACTING, expiryDate = "2026-10-25"), // تاریخ برابر با Pen B
+            InsulinPen(id = "3", name = "Pen C", type = InsulinType.LONG_ACTING, expiryDate = "2026-10-25"), // same expiry as Pen B
             InsulinPen(id = "4", name = "Pen D", type = InsulinType.LONG_ACTING, expiryDate = "2026-12-01")
         )
 
         PriorityCalculator.assignPrioritiesAndDays(pens, today)
 
-        // ردیف اول و دوم باید دارای تاریخ ۲۰۲۶-۱۰-۲۵ باشند
+        // First two rows must be the 2026-10-25 pens
         assertEquals("2026-10-25", pens[0].expiryDate)
         assertEquals("2026-10-25", pens[1].expiryDate)
-        // اولویت مصرف هر دو باید دقیقاً ۱ باشد!
+        // Both must receive priority rank 1
         assertEquals(1, pens[0].priority)
         assertEquals(1, pens[1].priority)
         assertEquals(7L, pens[0].daysRemaining)
         assertEquals(7L, pens[1].daysRemaining)
 
-        // ردیف سوم باید دارای تاریخ ۲۰۲۶-۱۱-۱۰ با اولویت ۲ باشد
+        // Third row is 2026-11-10 with priority 2
         assertEquals("2026-11-10", pens[2].expiryDate)
         assertEquals(2, pens[2].priority)
         assertEquals(23L, pens[2].daysRemaining)
 
-        // ردیف چهارم باید دارای تاریخ ۲۰۲۶-۱۲-۰۱ با اولویت ۳ باشد
+        // Fourth row is 2026-12-01 with priority 3
         assertEquals("2026-12-01", pens[3].expiryDate)
         assertEquals(3, pens[3].priority)
         assertEquals(44L, pens[3].daysRemaining)
     }
 
     // ==========================================
-    // ۴. آزمون استقلال رکوردهای ثبت گروهی
+    // 4. Independence of grouped entry records
     // ==========================================
 
     @Test
@@ -198,12 +202,12 @@ class MyPenCompatibilityTest {
             )
         }
 
-        // ۴ رکورد با ۴ شناسه یکتای مجزا
+        // 4 records with 4 distinct IDs
         assertEquals(4, pens.size)
         val ids = pens.map { it.id }.toSet()
         assertEquals(4, ids.size)
 
-        // تغییر وضعیت یکی روی بقیه تأثیر نمی‌گذارد
+        // Changing one record must not affect the others
         pens[0].status = PenStatus.OPENED
         pens[0].openedDate = today
 
@@ -214,34 +218,34 @@ class MyPenCompatibilityTest {
     }
 
     // ==========================================
-    // ۵. آزمون محاسبات تقویمی و روز صفر انقضا
+    // 5. Calendar math and zero-day expiry boundary
     // ==========================================
 
     @Test
     fun testCalendarCalculations() {
         val today = "2026-10-18"
 
-        // روز صفر = منقضی
+        // Zero day = expired
         assertEquals(0L, DateUtils.calculateDaysRemaining("2026-10-18", today))
         assertTrue(DateUtils.isExpired("2026-10-18", today))
 
-        // روز گذشته = منقضی
+        // Past day = expired
         assertEquals(-3L, DateUtils.calculateDaysRemaining("2026-10-15", today))
         assertTrue(DateUtils.isExpired("2026-10-15", today))
 
-        // بازه ۳۰ روز آینده
+        // 30 days from now
         val in30Days = DateUtils.addDays(today, 30)
         assertEquals(30L, DateUtils.calculateDaysRemaining(in30Days, today))
         assertTrue(DateUtils.isExpiringSoon(in30Days, today))
 
-        // بیش از ۳۰ روز
+        // More than 30 days
         val in31Days = DateUtils.addDays(today, 31)
         assertEquals(31L, DateUtils.calculateDaysRemaining(in31Days, today))
         assertFalse(DateUtils.isExpiringSoon(in31Days, today))
     }
 
     // ==========================================
-    // ۶. آزمون اعتبارسنجی ارقام انگلیسی (ASCII 0-9)
+    // 6. English digits integrity (ASCII 0-9)
     // ==========================================
 
     @Test
@@ -249,7 +253,7 @@ class MyPenCompatibilityTest {
         val formatted = DateUtils.formatEnglish(1234567890L)
         assertEquals("1234567890", formatted)
         for (c in formatted.toCharArray()) {
-            assertTrue("کاراکتر $c باید رقم انگلیسی باشد", c in '0'..'9')
+            assertTrue("Character $c must be an ASCII digit", c in '0'..'9')
         }
     }
 }

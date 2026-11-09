@@ -9,11 +9,9 @@
     <string name="nav_settings">تنظیمات</string>
 
     <!-- Dashboard -->
-    <string name="dashboard_title">نمای کلی موجودی انسولین</string>
     <string name="total_active_pens">کل قلم‌های فعال و بازنشده</string>
     <string name="long_acting_pens">انسولین بلنداثر</string>
     <string name="short_acting_pens">انسولین کوتاه‌اثر</string>
-    <string name="expiring_soon_pens">نزدیک به انقضا (تا ۳۰ روز آینده)</string>
     <string name="expired_pens">قلم‌های منقضی‌شده</string>
     <string name="quick_actions">دسترسی سریع</string>
     <string name="btn_add_pen">افزودن قلم جدید</string>
@@ -37,9 +35,6 @@
     <string name="type_short">کوتاه‌اثر</string>
 
     <!-- Statuses -->
-    <string name="status_active_label">موجود</string>
-    <string name="status_opened_label">بازشده</string>
-    <string name="status_defective_label">معیوب</string>
     <string name="status_expired_label">منقضی‌شده</string>
 
     <!-- Add Pen Form -->
@@ -52,21 +47,16 @@
     <string name="field_pen_count">تعداد قلم‌ها</string>
     <string name="field_pen_count_hint">عدد صحیح مثبت (مثلاً 1 یا 5)</string>
     <string name="btn_save_pens">ذخیره و ثبت در موجودی</string>
-    <string name="msg_pens_added_success">%1$d قلم با شناسه‌های مستقل با موفقیت در موجودی ثبت شدند.</string>
     <string name="err_empty_name">لطفاً نام انسولین را وارد نمایید.</string>
-    <string name="err_invalid_type">لطفاً نوع اثر (بلنداثر یا کوتاه‌اثر) را انتخاب فرمایید.</string>
     <string name="err_invalid_date">لطفاً تاریخ انقضای معتبر با قالب YYYY-MM-DD وارد نمایید.</string>
     <string name="err_invalid_count">تعداد قلم‌ها باید یک عدد صحیح بزرگ‌تر از صفر باشد.</string>
+    <string name="err_count_too_large">حداکثر 100 قلم در هر ثبت امکان‌پذیر است.</string>
 
     <!-- Pen Details -->
     <string name="pen_details_title">جزئیات قلم انسولین</string>
     <string name="label_pen_id">شناسه یکتا:</string>
-    <string name="label_pen_name">نام انسولین:</string>
-    <string name="label_pen_type">نوع اثر:</string>
     <string name="label_pen_expiry">تاریخ انقضا:</string>
-    <string name="label_pen_status">وضعیت فعلی:</string>
     <string name="label_days_remaining">روزهای باقی‌مانده:</string>
-    <string name="label_priority">اولویت مصرف:</string>
     <string name="label_entry_date">تاریخ ورود به موجودی:</string>
     <string name="label_opened_date">تاریخ باز شدن:</string>
     <string name="label_defective_date">تاریخ ثبت خرابی:</string>
@@ -87,22 +77,18 @@
     <string name="dialog_open_title">ثبت باز شدن قلم</string>
     <string name="dialog_open_prompt">تاریخ باز شدن قلم را وارد کنید (قالب: YYYY-MM-DD):</string>
     <string name="btn_confirm_open">ثبت باز شدن</string>
-    <string name="msg_pen_opened">قلم با موفقیت به عنوان «بازشده» ثبت و به تاریخچه منتقل شد.</string>
 
     <!-- Mark Defective Dialog -->
     <string name="dialog_defective_title">ثبت قلم معیوب</string>
     <string name="dialog_defective_prompt">دلیل خرابی یا نقص قلم را شرح دهید:</string>
     <string name="dialog_defective_hint">مثال: تغییر رنگ مایع، شکستگی پیستون، نشت...</string>
     <string name="btn_confirm_defective">ثبت خرابی</string>
-    <string name="msg_pen_defective">خرابی قلم ثبت و به تاریخچه منتقل شد.</string>
 
     <!-- Edit Dialog -->
     <string name="dialog_edit_title">ویرایش مشخصات قلم</string>
     <string name="btn_save_changes">ذخیره تغییرات</string>
-    <string name="msg_pen_updated">مشخصات قلم با موفقیت به‌روزرسانی شد.</string>
 
     <!-- History -->
-    <string name="history_title">تاریخچه رویدادها</string>
     <string name="filter_all">همه</string>
     <string name="filter_opened">بازشده</string>
     <string name="filter_defective">معیوب</string>
@@ -110,7 +96,6 @@
     <string name="empty_history">هیچ رویدادی در تاریخچه ثبت نشده است.</string>
 
     <!-- Settings -->
-    <string name="settings_title">تنظیمات و پشتیبان‌گیری</string>
     <string name="section_notifications">تنظیمات اعلان‌های پیش از انقضا</string>
     <string name="notify_30_days">اعلان ۳۰ روز پیش از انقضا</string>
     <string name="notify_14_days">اعلان ۱۴ روز پیش از انقضا</string>
@@ -127,7 +112,6 @@
     <string name="btn_confirm_restore">بازیابی قطعی</string>
     <string name="msg_backup_created">فایل پشتیبان با موفقیت تهیه شد.</string>
     <string name="msg_restore_success">بازیابی اطلاعات با موفقیت انجام شد.</string>
-    <string name="err_restore_failed">خطا در بازیابی: فایل پشتیبان نامعتبر است یا ساختار آن همخوانی ندارد. داده‌های قبلی حفظ شدند.</string>
 
     <!-- Expired Pens Dialog/List -->
     <string name="expired_pens_title">فهرست قلم‌های منقضی‌شده</string>

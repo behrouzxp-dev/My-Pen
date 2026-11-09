@@ -16,6 +16,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.arena.mypen.MainActivity
+import com.arena.mypen.R
 import com.arena.mypen.data.PenRepository
 import com.arena.mypen.model.InsulinPen
 import com.arena.mypen.util.DateUtils
@@ -69,23 +70,20 @@ object NotificationHelper {
         for (pen in activePens) {
             val days = DateUtils.calculateDaysRemaining(pen.expiryDate, today)
 
-            if (days == 30L && settings.notify30Days && !repo.hasNotified(pen.id, 30)) {
-                if (sendNotification(context, pen, 30)) {
-                    repo.recordNotification(pen.id, 30)
-                    sentCount++
-                }
-            }
-
-            if (days == 14L && settings.notify14Days && !repo.hasNotified(pen.id, 14)) {
-                if (sendNotification(context, pen, 14)) {
-                    repo.recordNotification(pen.id, 14)
-                    sentCount++
-                }
-            }
-
-            if (days == 7L && settings.notify7Days && !repo.hasNotified(pen.id, 7)) {
-                if (sendNotification(context, pen, 7)) {
-                    repo.recordNotification(pen.id, 7)
+            // Fire an enabled, not-yet-sent threshold as soon as the pen is
+            // within its window (daysRemaining <= threshold), instead of only
+            // on the exact day. The notification_logs table prevents repeats.
+            val thresholds = listOf(
+                30 to settings.notify30Days,
+                14 to settings.notify14Days,
+                7 to settings.notify7Days
+            )
+            for ((thresholdDays, enabled) in thresholds) {
+                if (!enabled) continue
+                if (days !in 0..thresholdDays.toLong()) continue
+                if (repo.hasNotified(pen.id, thresholdDays)) continue
+                if (sendNotification(context, pen, thresholdDays)) {
+                    repo.recordNotification(pen.id, thresholdDays)
                     sentCount++
                 }
             }
@@ -107,7 +105,8 @@ object NotificationHelper {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
-        val requestCode = Math.abs(pen.id.hashCode() + thresholdDays)
+        // Deterministic, always non-negative, and bounded to Int range.
+        val requestCode = (pen.id.hashCode() and 0x7fffffff) % 1_000_000_000 + thresholdDays
         val pendingIntent = PendingIntent.getActivity(
             context,
             requestCode,
@@ -119,7 +118,7 @@ object NotificationHelper {
         val message = "قلم ${pen.name} (${pen.type.persianLabel}) در تاریخ ${pen.expiryDate} منقضی می‌شود. لطفاً اولویت مصرف را رعایت فرمایید."
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))

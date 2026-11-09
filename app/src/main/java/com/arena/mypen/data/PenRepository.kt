@@ -30,6 +30,7 @@ class PenRepository(private val dbHelper: AppDatabase) {
         require(name.trim().isNotEmpty()) { "نام انسولین نمی‌تواند خالی باشد." }
         require(DateUtils.isValidDate(expiryDate)) { "تاریخ انقضا نامعتبر است." }
         require(count > 0) { "تعداد قلم‌ها باید بزرگ‌تر از صفر باشد." }
+        require(count <= MAX_PENS_PER_ENTRY) { "حداکثر $MAX_PENS_PER_ENTRY قلم در هر ثبت امکان‌پذیر است." }
 
         val db = dbHelper.writableDatabase
         val generatedIds = mutableListOf<String>()
@@ -82,7 +83,8 @@ class PenRepository(private val dbHelper: AppDatabase) {
     }
 
     /**
-     * Transitions ACTIVE pens with expiry_date <= today to EXPIRED.
+     * Transitions ACTIVE and OPENED pens with expiry_date <= today to EXPIRED.
+     * DEFECTIVE pens keep their DEFECTIVE status (defect supersedes expiry).
      * Records exactly one EXPIRED event in history per pen.
      */
     @Synchronized
@@ -93,8 +95,8 @@ class PenRepository(private val dbHelper: AppDatabase) {
         val expiredIds = mutableListOf<String>()
 
         val cursor = db.rawQuery(
-            "SELECT id FROM ${AppDatabase.TABLE_PENS} WHERE status = ? AND expiry_date <= ?",
-            arrayOf(PenStatus.ACTIVE.name, today)
+            "SELECT id FROM ${AppDatabase.TABLE_PENS} WHERE status IN (?, ?) AND expiry_date <= ?",
+            arrayOf(PenStatus.ACTIVE.name, PenStatus.OPENED.name, today)
         )
         cursor.use {
             while (it.moveToNext()) {
@@ -675,6 +677,8 @@ class PenRepository(private val dbHelper: AppDatabase) {
     }
 
     companion object {
+        const val MAX_PENS_PER_ENTRY = 100
+
         @Volatile
         private var instance: PenRepository? = null
 

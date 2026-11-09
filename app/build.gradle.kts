@@ -3,6 +3,24 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+// Release signing configuration is read from environment variables or from an
+// untracked gradle.properties (e.g. in GRADLE_USER_HOME, never committed).
+// Never hardcode signing credentials in this file. See SECURITY.md for details.
+val releaseStoreFilePath: String = System.getenv("MYPEN_KEYSTORE_PATH")
+    ?: findProperty("MYPEN_KEYSTORE_PATH") as String?
+    ?: "../../key/mypen-release.jks"
+val releaseStorePassword: String? = System.getenv("MYPEN_STORE_PASSWORD")
+    ?: findProperty("MYPEN_STORE_PASSWORD") as String?
+val releaseKeyAlias: String = System.getenv("MYPEN_KEY_ALIAS")
+    ?: findProperty("MYPEN_KEY_ALIAS") as String?
+    ?: "mypen"
+val releaseKeyPassword: String? = System.getenv("MYPEN_KEY_PASSWORD")
+    ?: findProperty("MYPEN_KEY_PASSWORD") as String?
+
+val hasReleaseSigning = file(releaseStoreFilePath).exists() &&
+    !releaseStorePassword.isNullOrBlank() &&
+    !releaseKeyPassword.isNullOrBlank()
+
 android {
     namespace = "com.arena.mypen"
     compileSdk = 34
@@ -17,29 +35,38 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = file("../../key/mypen-release.jks")
-            storePassword = "MyPenSecureKey2026"
-            keyAlias = "mypen"
-            keyPassword = "MyPenSecureKey2026"
-            enableV1Signing = true
-            enableV2Signing = true
+    if (hasReleaseSigning) {
+        signingConfigs {
+            create("release") {
+                storeFile = file(releaseStoreFilePath)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+                enableV1Signing = true
+                enableV2Signing = true
+            }
         }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            } else {
+                logger.lifecycle(
+                    "WARNING: Release signing secrets are not configured. " +
+                        "The release build will be UNSIGNED. See SECURITY.md."
+                )
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
         debug {
-            applicationIdSuffix = ""
-            signingConfig = signingConfigs.getByName("release")
+            // Uses the default auto-generated debug keystore so any machine
+            // and CI can build debug APKs without the release keystore.
         }
     }
 
