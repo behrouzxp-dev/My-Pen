@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-09
+
+First stable release. Originally imported as the Kotlin/Android baseline on
+2026-10-29 (applicationId `com.arena.mypen`, versionCode 1000); this release
+adds the audit remediation, the test suite, CI/release automation, full
+documentation, and the application ID rename to `com.mypen.app`.
+
+### Baseline features
+
+- Inventory of long-acting/short-acting insulin pens with per-pen status
+  (ACTIVE, OPENED, DEFECTIVE, EXPIRED).
+- Consumption priority ranking by expiry date (equal expiry = equal rank).
+- Atomic group entry of identical pens.
+- Automatic transition of expired ACTIVE pens with history events.
+- Dashboard metrics, inventory list, history log with type filters.
+- Notification settings (30/14/7 days) with a periodic WorkManager check.
+- JSON backup export/restore (`schemaVersion: 1`), atomic restore.
+- Persian (RTL) UI built with Jetpack Compose.
+
 ### Security
 
 - Removed the hardcoded release keystore credentials (`storePassword` /
@@ -68,18 +87,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 21 unused vector drawables and 17 unused string resources.
 - `colors.xml` (duplicate color source); `Color.kt` is now authoritative.
-
-## [1.0.0] - 2026-10-29
-
-Initial import of the My Pen v1.0.0 Kotlin/Android baseline
-(applicationId `com.arena.mypen`, versionCode 1000):
-
-- Inventory of long-acting/short-acting insulin pens with per-pen status
-  (ACTIVE, OPENED, DEFECTIVE, EXPIRED).
-- Consumption priority ranking by expiry date (equal expiry = equal rank).
-- Atomic group entry of identical pens.
-- Automatic transition of expired ACTIVE pens with history events.
-- Dashboard metrics, inventory list, history log with type filters.
-- Notification settings (30/14/7 days) with a periodic WorkManager check.
-- JSON backup export/restore (`schemaVersion: 1`), atomic restore.
-- Persian (RTL) UI built with Jetpack Compose.
