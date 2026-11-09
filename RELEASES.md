@@ -23,8 +23,8 @@ and only from an approved tag.
    `RELEASES.md`, `README.md`, `.github/README.md`, and affected `docs/`).
 2. CI is green on `main` (enforced for pull requests; see `.github/workflows/ci.yml`).
 3. Signing secrets are configured in the repository:
-   `MYPEN_KEYSTORE_BASE64`, `MYPEN_STORE_PASSWORD`, `MYPEN_KEY_ALIAS`,
-   `MYPEN_KEY_PASSWORD` (see SECURITY.md).
+   `Keystore_base64`, `Keystore_password`, `Key_alias`,
+   `Key_password` (see SECURITY.md).
 4. The owner has sent the word **`tag`** and selected the version.
 
 ## Tagging (owner-initiated)

@@ -20,8 +20,10 @@ against production builds you do not own.
   `gradle.properties` in `GRADLE_USER_HOME`:
   `MYPEN_KEYSTORE_PATH`, `MYPEN_STORE_PASSWORD`, `MYPEN_KEY_ALIAS`,
   `MYPEN_KEY_PASSWORD`.
-- CI/release workflows decode the keystore from the GitHub secret
-  `MYPEN_KEYSTORE_BASE64` at build time only.
+- CI/release workflows decode the keystore from the repository secret
+  `Keystore_base64` at build time only. The Gradle build reads the
+  `MYPEN_*` environment variables, which `release.yml` maps from those
+  repository secrets (with this exact naming).
 - Debug builds use the default Android debug keystore.
 - **Known historical exposure:** a release keystore password was committed
   in plaintext in `app/build.gradle.kts` up to 2026-11-09. The password must
