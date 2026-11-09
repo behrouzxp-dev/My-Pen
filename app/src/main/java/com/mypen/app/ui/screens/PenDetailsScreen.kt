@@ -1,47 +1,59 @@
 package com.mypen.app.ui.screens
 
-import android.app.DatePickerDialog
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mypen.app.R
-import com.mypen.app.model.*
+import com.mypen.app.model.EventType
+import com.mypen.app.model.HistoryEvent
+import com.mypen.app.model.InsulinPen
+import com.mypen.app.model.InsulinType
+import com.mypen.app.model.PenStatus
+import com.mypen.app.ui.components.AppCard
+import com.mypen.app.ui.components.CountdownRing
+import com.mypen.app.ui.components.DateField
+import com.mypen.app.ui.components.EventChip
+import com.mypen.app.ui.components.MyPenTopBar
+import com.mypen.app.ui.components.SectionHeader
+import com.mypen.app.ui.components.ShelfLifeBar
+import com.mypen.app.ui.components.StatusChip
+import com.mypen.app.ui.components.TypeSelector
+import com.mypen.app.ui.components.TypeChip
 import com.mypen.app.ui.theme.*
 import com.mypen.app.util.DateUtils
-import java.util.Calendar
-import java.util.Locale
+import com.mypen.app.util.PersianText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PenDetailsScreen(
     pen: InsulinPen?,
     historyEvents: List<HistoryEvent>,
+    today: String,
+    isLoading: Boolean = false,
     onNavigateBack: () -> Unit,
     onUpdatePen: (newName: String, newType: InsulinType, newExpiry: String) -> Unit,
     onMarkOpened: (openedDate: String) -> Unit,
     onMarkDefective: (reason: String) -> Unit,
     onDeletePen: () -> Unit
 ) {
-    val context = LocalContext.current
-
     var showEditDialog by remember { mutableStateOf(false) }
     var showOpenDialog by remember { mutableStateOf(false) }
     var showDefectiveDialog by remember { mutableStateOf(false) }
@@ -49,16 +61,12 @@ fun PenDetailsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.pen_details_title), color = SurfaceWhite, fontSize = 18.sp) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowForward, contentDescription = "بازگشت", tint = SurfaceWhite)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = PrimaryBlue)
+            MyPenTopBar(
+                title = stringResource(R.string.pen_details_title),
+                onBack = onNavigateBack
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         if (pen == null) {
             Box(
@@ -67,248 +75,282 @@ fun PenDetailsScreen(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "قلم مورد نظر یافت نشد.", color = TextHint)
+                if (isLoading) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                } else {
+                    com.mypen.app.ui.components.EmptyState(
+                        icon = Icons.Filled.Search,
+                        title = stringResource(R.string.pen_not_found_title),
+                        description = stringResource(R.string.pen_not_found_desc),
+                        actionLabel = stringResource(R.string.action_back),
+                        onAction = onNavigateBack
+                    )
+                }
             }
             return@Scaffold
         }
+
+        val daysRemaining = DateUtils.calculateDaysRemaining(pen.expiryDate, today)
+        val accent = expiryAccent(daysRemaining)
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(Spacing.lg),
+            verticalArrangement = Arrangement.spacedBy(Spacing.lg)
         ) {
-            // Card 1: Pen Header & Metadata
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                border = BorderStroke(1.dp, DividerColor),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
+            // 1. Hero card
+            AppCard {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                        .padding(Spacing.lg),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.md)
                 ) {
-                    // Header Name & Badges
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CountdownRing(
+                            fractionRemaining = (daysRemaining.toFloat() / 90f).coerceIn(0f, 1f),
+                            accent = accent,
+                            size = 92.dp,
+                            strokeWidth = 7.dp
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = PersianText.number(if (daysRemaining > 0L) daysRemaining else 0L),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = accent
+                                )
+                                Text(
+                                    text = stringResource(R.string.unit_day),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(Spacing.lg))
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.xs)
+                        ) {
+                            Text(
+                                text = pen.name,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                                TypeChip(type = pen.type)
+                                StatusChip(status = pen.status)
+                            }
+                            Text(
+                                text = DateUtils.remainingLabel(daysRemaining),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = accent
+                            )
+                        }
+                    }
+
+                    ShelfLifeBar(
+                        fractionElapsed = DateUtils.shelfLifeProgress(
+                            pen.entryDate,
+                            pen.expiryDate,
+                            today
+                        ),
+                        accent = accent
+                    )
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = pen.name,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = TextPrimary,
-                            modifier = Modifier.weight(1f),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+                            text = stringResource(R.string.label_pen_expiry),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = if (pen.type == InsulinType.LONG_ACTING) TypeLongActingBg else TypeShortActingBg,
-                            border = BorderStroke(1.dp, if (pen.type == InsulinType.LONG_ACTING) TypeLongActing else TypeShortActing)
-                        ) {
-                            Text(
-                                text = pen.type.persianLabel,
-                                color = if (pen.type == InsulinType.LONG_ACTING) TypeLongActing else TypeShortActing,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = when (pen.status) {
-                                PenStatus.ACTIVE -> StatusActiveBg
-                                PenStatus.OPENED -> StatusOpenedBg
-                                PenStatus.DEFECTIVE -> StatusDefectiveBg
-                                PenStatus.EXPIRED -> StatusExpiredBg
-                            },
-                            border = BorderStroke(
-                                1.dp,
-                                when (pen.status) {
-                                    PenStatus.ACTIVE -> StatusActive
-                                    PenStatus.OPENED -> StatusOpened
-                                    PenStatus.DEFECTIVE -> StatusDefective
-                                    PenStatus.EXPIRED -> StatusExpired
-                                }
-                            )
-                        ) {
-                            Text(
-                                text = pen.status.persianLabel,
-                                color = when (pen.status) {
-                                    PenStatus.ACTIVE -> StatusActive
-                                    PenStatus.OPENED -> StatusOpened
-                                    PenStatus.DEFECTIVE -> StatusDefective
-                                    PenStatus.EXPIRED -> StatusExpired
-                                },
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            )
-                        }
-                    }
-
-                    Divider(color = DividerColor)
-
-                    DetailRow(label = stringResource(R.string.label_pen_id), value = pen.id)
-                    DetailRow(label = stringResource(R.string.label_pen_expiry), value = pen.expiryDate, isBold = true)
-
-                    if (pen.status == PenStatus.ACTIVE) {
-                        DetailRow(
-                            label = stringResource(R.string.label_days_remaining),
-                            value = "${DateUtils.formatEnglish(pen.daysRemaining)} روز",
-                            valueColor = PrimaryDarkBlue,
-                            isBold = true
+                        Text(
+                            text = DateUtils.displayDateLong(pen.expiryDate),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
-                    }
-
-                    DetailRow(label = stringResource(R.string.label_entry_date), value = pen.entryDate)
-
-                    if (!pen.openedDate.isNullOrBlank()) {
-                        DetailRow(label = stringResource(R.string.label_opened_date), value = pen.openedDate!!, valueColor = StatusOpened, isBold = true)
-                    }
-
-                    if (!pen.defectiveDate.isNullOrBlank()) {
-                        DetailRow(label = stringResource(R.string.label_defective_date), value = pen.defectiveDate!!, valueColor = StatusDefective)
-                        DetailRow(label = stringResource(R.string.label_defective_reason), value = pen.defectiveReason ?: "-")
                     }
                 }
             }
 
-            // Card 2: Operations / Actions
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                border = BorderStroke(1.dp, DividerColor),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
+            // 2. Metadata
+            SectionHeader(title = stringResource(R.string.section_pen_information))
+            AppCard {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                        .padding(Spacing.lg),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.sm)
                 ) {
-                    Text(
-                        text = "عملیات روی این قلم",
-                        color = PrimaryBlue,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                    DetailRow(
+                        label = stringResource(R.string.label_pen_id),
+                        value = pen.id.take(8)
                     )
+                    DetailRow(
+                        label = stringResource(R.string.label_entry_date),
+                        value = DateUtils.displayDateLong(pen.entryDate)
+                    )
+                    if (!pen.openedDate.isNullOrBlank()) {
+                        DetailRow(
+                            label = stringResource(R.string.label_opened_date),
+                            value = DateUtils.displayDateLong(pen.openedDate),
+                            valueColor = StatusOpened
+                        )
+                    }
+                    if (!pen.defectiveDate.isNullOrBlank()) {
+                        DetailRow(
+                            label = stringResource(R.string.label_defective_date),
+                            value = DateUtils.displayDateLong(pen.defectiveDate),
+                            valueColor = StatusDefective
+                        )
+                        DetailRow(
+                            label = stringResource(R.string.label_defective_reason),
+                            value = pen.defectiveReason ?: stringResource(R.string.value_not_set)
+                        )
+                    }
+                }
+            }
 
-                    // Edit button
+            // 3. Actions
+            SectionHeader(title = stringResource(R.string.section_pen_actions))
+            AppCard {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(Spacing.md),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.sm)
+                ) {
                     OutlinedButton(
                         onClick = { showEditDialog = true },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        border = BorderStroke(1.dp, PrimaryBlue),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = PrimaryBlue)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(Radius.sm)
                     ) {
-                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = stringResource(R.string.btn_edit_pen), fontSize = 13.sp)
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(Spacing.sm))
+                        Text(
+                            text = stringResource(R.string.btn_edit_pen),
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
 
-                    // Mark Opened (active only)
                     if (pen.status == PenStatus.ACTIVE) {
                         Button(
                             onClick = { showOpenDialog = true },
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = StatusOpened)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp),
+                            shape = RoundedCornerShape(Radius.sm)
                         ) {
-                            Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = stringResource(R.string.btn_mark_opened), fontSize = 13.sp)
+                            Icon(
+                                imageVector = Icons.Filled.CheckCircle,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(Spacing.sm))
+                            Text(
+                                text = stringResource(R.string.btn_mark_opened),
+                                style = MaterialTheme.typography.labelLarge
+                            )
                         }
-
-                        // Mark Defective (active only)
                         OutlinedButton(
                             onClick = { showDefectiveDialog = true },
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            border = BorderStroke(1.dp, StatusDefective),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp),
+                            shape = RoundedCornerShape(Radius.sm),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = StatusDefective)
                         ) {
-                            Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = stringResource(R.string.btn_mark_defective), fontSize = 13.sp)
+                            Icon(
+                                imageVector = Icons.Filled.Warning,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(Spacing.sm))
+                            Text(
+                                text = stringResource(R.string.btn_mark_defective),
+                                style = MaterialTheme.typography.labelLarge
+                            )
                         }
                     }
 
-                    // Delete Permanently
-                    OutlinedButton(
+                    TextButton(
                         onClick = { showDeleteConfirmDialog = true },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        border = BorderStroke(1.dp, StatusExpired),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = StatusExpired)
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
                     ) {
-                        Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = stringResource(R.string.btn_delete_permanently), fontSize = 13.sp)
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(Spacing.sm))
+                        Text(
+                            text = stringResource(R.string.btn_delete_permanently),
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
                 }
             }
 
-            // Card 3: History Events
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                border = BorderStroke(1.dp, DividerColor),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
+            // 4. History
+            SectionHeader(title = stringResource(R.string.label_pen_history))
+            AppCard {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                        .padding(Spacing.lg),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.md)
                 ) {
-                    Text(
-                        text = stringResource(R.string.label_pen_history),
-                        color = PrimaryBlue,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-
                     if (historyEvents.isEmpty()) {
                         Text(
-                            text = "هنوز رویدادی ثبت نشده است.",
-                            color = TextHint,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            text = stringResource(R.string.pen_history_empty),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     } else {
-                        historyEvents.forEach { ev ->
-                            HistoryItem(event = ev)
-                            Divider(color = DividerColor, thickness = 0.5.dp)
+                        historyEvents.forEachIndexed { index, event ->
+                            HistoryItem(event = event)
+                            if (index != historyEvents.lastIndex) {
+                                HorizontalDivider(
+                                    thickness = 1.dp,
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                                )
+                            }
                         }
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(Spacing.xl))
         }
     }
 
-    // Dialog 1: Edit
-    if (showEditDialog) {
-        var editName by remember { mutableStateOf(pen?.name ?: "") }
-        var editType by remember { mutableStateOf(pen?.type ?: InsulinType.LONG_ACTING) }
-        var editExpiry by remember { mutableStateOf(pen?.expiryDate ?: "") }
+    // Dialog 1: edit
+    if (showEditDialog && pen != null) {
+        var editName by remember { mutableStateOf(pen.name) }
+        var editType by remember { mutableStateOf(pen.type) }
+        var editExpiry by remember { mutableStateOf(pen.expiryDate) }
 
         AlertDialog(
             onDismissRequest = { showEditDialog = false },
-            title = { Text(stringResource(R.string.dialog_edit_title), fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.dialog_edit_title)) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
                     OutlinedTextField(
                         value = editName,
                         onValueChange = { editName = it },
@@ -316,47 +358,25 @@ fun PenDetailsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                            RadioButton(
-                                selected = editType == InsulinType.LONG_ACTING,
-                                onClick = { editType = InsulinType.LONG_ACTING },
-                                colors = RadioButtonDefaults.colors(selectedColor = PrimaryBlue)
-                            )
-                            Text(stringResource(R.string.type_long), fontSize = 13.sp)
-                        }
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                            RadioButton(
-                                selected = editType == InsulinType.SHORT_ACTING,
-                                onClick = { editType = InsulinType.SHORT_ACTING },
-                                colors = RadioButtonDefaults.colors(selectedColor = PrimaryBlue)
-                            )
-                            Text(stringResource(R.string.type_short), fontSize = 13.sp)
-                        }
-                    }
-
-                    OutlinedTextField(
-                        value = editExpiry,
-                        onValueChange = { editExpiry = it },
-                        label = { Text(stringResource(R.string.field_expiry_date)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
+                    TypeSelector(
+                        selected = editType,
+                        onSelected = { editType = it }
+                    )
+                    DateField(
+                        label = stringResource(R.string.field_expiry_date),
+                        isoDate = editExpiry,
+                        onDateChange = { editExpiry = it }
                     )
                 }
             },
             confirmButton = {
-                Button(
+                TextButton(
                     onClick = {
                         if (editName.isNotBlank() && DateUtils.isValidDate(editExpiry)) {
-                            onUpdatePen(editName.trim(), editType, editExpiry.trim())
+                            onUpdatePen(editName.trim(), editType, editExpiry)
                             showEditDialog = false
                         }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
+                    }
                 ) {
                     Text(stringResource(R.string.btn_save_changes))
                 }
@@ -369,33 +389,35 @@ fun PenDetailsScreen(
         )
     }
 
-    // Dialog 2: Mark Opened
+    // Dialog 2: mark opened
     if (showOpenDialog) {
         var openDate by remember { mutableStateOf(DateUtils.todayDate()) }
 
         AlertDialog(
             onDismissRequest = { showOpenDialog = false },
-            title = { Text(stringResource(R.string.dialog_open_title), fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.dialog_open_title)) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.dialog_open_prompt), fontSize = 13.sp)
-                    OutlinedTextField(
-                        value = openDate,
-                        onValueChange = { openDate = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    Text(
+                        text = stringResource(R.string.dialog_open_prompt),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    DateField(
+                        label = stringResource(R.string.dialog_open_date_label),
+                        isoDate = openDate,
+                        onDateChange = { openDate = it }
                     )
                 }
             },
             confirmButton = {
-                Button(
+                TextButton(
                     onClick = {
                         if (DateUtils.isValidDate(openDate)) {
-                            onMarkOpened(openDate.trim())
+                            onMarkOpened(openDate)
                             showOpenDialog = false
                         }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = StatusOpened)
+                    }
                 ) {
                     Text(stringResource(R.string.btn_confirm_open))
                 }
@@ -408,16 +430,20 @@ fun PenDetailsScreen(
         )
     }
 
-    // Dialog 3: Mark Defective
+    // Dialog 3: mark defective
     if (showDefectiveDialog) {
         var defectReason by remember { mutableStateOf("") }
 
         AlertDialog(
             onDismissRequest = { showDefectiveDialog = false },
-            title = { Text(stringResource(R.string.dialog_defective_title), fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.dialog_defective_title)) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.dialog_defective_prompt), fontSize = 13.sp)
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    Text(
+                        text = stringResource(R.string.dialog_defective_prompt),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     OutlinedTextField(
                         value = defectReason,
                         onValueChange = { defectReason = it },
@@ -428,12 +454,11 @@ fun PenDetailsScreen(
                 }
             },
             confirmButton = {
-                Button(
+                TextButton(
                     onClick = {
                         onMarkDefective(defectReason.trim())
                         showDefectiveDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = StatusDefective)
+                    }
                 ) {
                     Text(stringResource(R.string.btn_confirm_defective))
                 }
@@ -446,19 +471,31 @@ fun PenDetailsScreen(
         )
     }
 
-    // Dialog 4: Delete Confirm
+    // Dialog 4: delete confirmation
     if (showDeleteConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmDialog = false },
-            title = { Text(stringResource(R.string.dialog_delete_title), fontWeight = FontWeight.Bold, color = StatusExpired) },
-            text = { Text(stringResource(R.string.dialog_delete_message), fontSize = 13.sp) },
+            title = {
+                Text(
+                    text = stringResource(R.string.dialog_delete_title),
+                    color = MaterialTheme.colorScheme.error
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.dialog_delete_message),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            },
             confirmButton = {
-                Button(
+                TextButton(
                     onClick = {
                         showDeleteConfirmDialog = false
                         onDeletePen()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = StatusExpired)
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
                 ) {
                     Text(stringResource(R.string.btn_confirm_delete))
                 }
@@ -476,7 +513,7 @@ fun PenDetailsScreen(
 fun DetailRow(
     label: String,
     value: String,
-    valueColor: androidx.compose.ui.graphics.Color = TextPrimary,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface,
     isBold: Boolean = false
 ) {
     Row(
@@ -484,14 +521,16 @@ fun DetailRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, color = TextSecondary, fontSize = 12.sp)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Text(
             text = value,
+            style = MaterialTheme.typography.labelMedium,
             color = valueColor,
-            fontSize = 12.sp,
-            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+            textAlign = TextAlign.End
         )
     }
 }
@@ -499,30 +538,25 @@ fun DetailRow(
 @Composable
 fun HistoryItem(event: HistoryEvent) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xs)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            EventChip(eventType = event.eventType)
             Text(
-                text = event.eventType.persianLabel,
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
-                color = when (event.eventType) {
-                    EventType.ENTRY -> StatusActive
-                    EventType.OPENED -> StatusOpened
-                    EventType.DEFECTIVE -> StatusDefective
-                    EventType.EXPIRED -> StatusExpired
-                    EventType.EDITED -> TypeLongActing
-                }
+                text = DateUtils.displayDateTime(event.eventTime),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Text(text = event.eventTime, color = TextHint, fontSize = 10.sp)
         }
-        Text(text = event.description, color = TextSecondary, fontSize = 12.sp)
+        Text(
+            text = event.description,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

@@ -125,4 +125,86 @@ object DateUtils {
     fun formatEnglish(number: Int): String {
         return String.format(Locale.US, "%d", number)
     }
+
+    // ---------------------------------------------------------------------
+    // Presentation helpers (Jalali calendar + Persian digits)
+    // ---------------------------------------------------------------------
+
+    private const val PLACEHOLDER = "—"
+
+    /** Formats an ISO Gregorian date as a short Jalali date: ۱۴۰۳/۰۸/۱۹ */
+    fun displayDate(isoDate: String?): String {
+        val jalali = JalaliDate.fromIsoDate(isoDate) ?: return PLACEHOLDER
+        val (jy, jm, jd) = jalali
+        return PersianText.digits(
+            String.format(Locale.US, "%04d/%02d/%02d", jy, jm, jd)
+        )
+    }
+
+    /** Formats an ISO Gregorian date as a long Jalali date: ۱۹ آبان ۱۴۰۳ */
+    fun displayDateLong(isoDate: String?): String {
+        val jalali = JalaliDate.fromIsoDate(isoDate) ?: return PLACEHOLDER
+        val (jy, jm, jd) = jalali
+        val monthName = JalaliDate.monthNames.getOrElse(jm - 1) { "" }
+        return "${PersianText.number(jd)} $monthName ${PersianText.number(jy)}"
+    }
+
+    /** Formats an ISO date-time stamp as ۱۹ آبان ۱۴۰۳ • ۱۴:۳۲ */
+    fun displayDateTime(dateTime: String?): String {
+        if (dateTime == null || dateTime.length < 10) return PLACEHOLDER
+        val datePart = displayDateLong(dateTime.substring(0, 10))
+        if (datePart == PLACEHOLDER) return PLACEHOLDER
+        val timePart = if (dateTime.length >= 16) {
+            val hour = dateTime.substring(11, 13)
+            val minute = dateTime.substring(14, 16)
+            PersianText.digits("$hour:$minute")
+        } else {
+            null
+        }
+        return if (timePart == null) datePart else "$datePart • $timePart"
+    }
+
+    /** Short month/day label used by the history timeline: ۱۹ آبان */
+    fun displayMonthDay(isoDate: String?): String {
+        val jalali = JalaliDate.fromIsoDate(isoDate) ?: return PLACEHOLDER
+        val (_, jm, jd) = jalali
+        val monthName = JalaliDate.monthNames.getOrElse(jm - 1) { "" }
+        return "${PersianText.number(jd)} $monthName"
+    }
+
+    /**
+     * Human readable shelf-life label for a number of remaining days.
+     * Examples: امروز, فردا, ۱۲ روز مانده, ۲ روز گذشته.
+     */
+    fun remainingLabel(days: Long): String {
+        return when {
+            days > 1L -> "${PersianText.number(days)} روز مانده"
+            days == 1L -> "فردا منقضی می‌شود"
+            days == 0L -> "امروز منقضی می‌شود"
+            days == -1L -> "۱ روز گذشته"
+            else -> "${PersianText.number(-days)} روز گذشته"
+        }
+    }
+
+    /** Classifies a date as today / yesterday / older for history grouping. */
+    fun relativeDayLabel(isoDate: String, today: String): String {
+        val days = calculateDaysRemaining(today, isoDate)
+        return when (days) {
+            0L -> "امروز"
+            1L -> "دیروز"
+            in 2L..7L -> "${PersianText.number(days)} روز پیش"
+            else -> displayDateLong(isoDate)
+        }
+    }
+
+    /**
+     * The fraction (0f..1f) of the shelf life that has already elapsed between
+     * [entryDate] and [expiryDate]. Used by the shelf-life progress bar.
+     */
+    fun shelfLifeProgress(entryDate: String, expiryDate: String, today: String): Float {
+        val total = calculateDaysRemaining(expiryDate, entryDate)
+        if (total <= 0L) return 0f
+        val elapsed = calculateDaysRemaining(today, entryDate)
+        return (elapsed.toFloat() / total.toFloat()).coerceIn(0f, 1f)
+    }
 }

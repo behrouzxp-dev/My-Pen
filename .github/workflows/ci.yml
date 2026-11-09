@@ -48,3 +48,6 @@ jobs:
 
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon
+
+      - name: Build release APK (verify R8 minification and resource shrinking)
+        run: gradle assembleRelease --no-daemon

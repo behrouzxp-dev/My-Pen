@@ -24,10 +24,23 @@ stock:
 - **Backup & restore**: full export/import of the database as a versioned
   JSON document (`schemaVersion: 1`). Restore is atomic and fully replaces
   current data after confirmation.
+- **Jalali dates**: every date is displayed in the Solar Hijri calendar with
+  Persian digits and relative labels («۱۲ روز مانده»), while storage stays ISO
+  Gregorian so databases and backups remain compatible. Dates are chosen with a
+  theme-aware Jalali picker.
+- **Home screen widget**: the three pens closest to expiry, always one glance
+  away.
+- **Actionable notifications**: mark a pen as opened straight from the
+  notification.
 
 ## Tech stack
 
 - Kotlin, Jetpack Compose (Material 3), RTL forced layout
+- Static Dark Theme (permanent, non-switchable) with embedded **Vazirmatn** Persian font (`res/font/vazirmatn_*.ttf`)
+- Design system with tokens and a reusable component library (`ui/theme`, `ui/components`) — see [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)
+- `navigation-compose` graph with animated transitions, edge-to-edge layout and a splash screen (`androidx.core:core-splashscreen`)
+- Jalali (Solar Hijri) calendar conversion and Persian digit formatting implemented in-project (no dependency)
+- R8 code shrinking, obfuscation, optimization, and resource shrinking enabled for release builds (`isMinifyEnabled = true`, `isShrinkResources = true`)
 - Raw SQLite via `SQLiteOpenHelper` (singleton), no Room
 - WorkManager for periodic expiry checks
 - Manual `org.json` (de)serialization for backups
@@ -60,14 +73,17 @@ CI runs the same steps on every pull request targeting `main`
 
 ```
 app/src/main/java/com/mypen/app/
-├── MainActivity.kt          # App shell, navigation, background data loading
+├── MainActivity.kt          # Edge-to-edge activity, intent/deep-link handling
 ├── MyPenApp.kt              # Application: notification channel + periodic work
 ├── data/                    # AppDatabase (SQLite) + PenRepository
 ├── model/                   # InsulinPen, HistoryEvent, enums, settings
-├── notification/            # NotificationHelper, ExpiryCheckWorker
+├── notification/            # NotificationHelper, ExpiryCheckWorker, action receiver
+├── ui/nav/                  # Route definitions + NavHost and app scaffold
+├── ui/components/           # Design-system components (cards, chips, picker, ...)
 ├── ui/screens/              # Compose screens (dashboard, inventory, ...)
-├── ui/theme/                # Color scheme (single source of color truth)
-└── util/                    # DateUtils (local TZ), PriorityCalculator
+├── ui/theme/                # Palette, typography, shapes, tokens, semantics
+├── util/                    # DateUtils, JalaliDate, PersianText, PriorityCalculator
+└── widget/                  # Home screen widget provider (RemoteViews)
 
 app/src/test/                # JVM unit tests + v0 backup fixture (classpath)
 ```
@@ -76,6 +92,7 @@ app/src/test/                # JVM unit tests + v0 backup fixture (classpath)
 
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md) — components, data model, backup format
 - [REQUIREMENTS.md](docs/REQUIREMENTS.md) — functional/non-functional requirements
+- [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) — colour, typography, spacing, motion and components
 - [CHANGELOG.md](CHANGELOG.md) — release history (Keep a Changelog + SemVer)
 - [RELEASES.md](RELEASES.md) — release process and artifact naming
 - [SECURITY.md](SECURITY.md) — signing policy, vulnerability reporting

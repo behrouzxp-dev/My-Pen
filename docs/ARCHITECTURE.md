@@ -128,12 +128,49 @@ groups sharing a date share a rank. `daysRemaining = expiryDate − today`.
 - Notification tap intent opens the `INVENTORY` tab with the pen's type.
 
 ### UI layer (`ui/`)
-Single `Activity` (`MainActivity`) with hand-rolled tab navigation
-(Dashboard/Inventory/History/Settings) plus three sub-screens
-(`AddPenScreen`, `PenDetailsScreen`, `ExpiredPensScreen`). Screen data is
-collected via `produceState` keyed on a `dataVersion` counter; bumping
-`dataVersion` reloads everything. Repository calls run on `Dispatchers.IO`.
-The layout direction is forced RTL in `MyPenTheme`.
+
+Single `Activity` (`MainActivity`, edge-to-edge with a branded splash screen)
+hosting a `navigation-compose` graph (`ui/nav/AppNavigation.kt`):
+
+```
+NavHost(startDestination = "dashboard")
+├── dashboard            # tab
+├── inventory            # tab
+├── history              # tab
+├── settings             # tab
+├── add_pen
+├── expired
+└── pen/{penId}
+```
+
+The four tabs share one `Scaffold` (top bar, bottom navigation with an
+"expiring soon" badge, extended FAB, snackbar host); sub-screens render their
+own `Scaffold` with a back arrow. Navigation uses animated transitions and
+`popUpTo(start) { saveState = true }` + `restoreState` for tab switching.
+Intents from notifications carry `OPEN_TAB`, `PEN_TYPE` and `PEN_ID`; the
+activity mirrors them into Compose state so a notification tapped while the
+activity already exists still opens the requested pen.
+
+Screen data is collected via `produceState` keyed on a `dataVersion` counter;
+bumping `dataVersion` reloads everything and refreshes the home screen widget.
+Repository calls run on `Dispatchers.IO`.
+
+The layout direction is forced RTL in `MyPenTheme`, which applies a permanent
+static dark color scheme (`Color.kt`), Vazirmatn typography (`Type.kt`) and the
+shape scale (`Theme.kt`). Spacing/radius/motion tokens live in `Dimens.kt`,
+domain-to-colour mapping in `Semantics.kt`, and reusable UI pieces in
+`ui/components` (see `docs/DESIGN_SYSTEM.md`).
+
+Dates are stored as ISO Gregorian strings and rendered as Jalali (Solar Hijri)
+through `util/JalaliDate.kt`; user-visible numbers use Persian digits from
+`util/PersianText.kt`. Feedback is delivered through snackbars
+(`AppMessages` / `LocalAppMessages`) rather than toasts.
+
+### Widget and notification actions
+`widget/MyPenWidgetProvider` (platform `RemoteViews`, no extra dependency)
+renders the three pens closest to expiry and is refreshed via `updateAll()`
+after every mutation. `notification/NotificationActionReceiver` handles the
+inline "opened" action of expiry notifications.
 
 ## Known limitations / deliberate decisions
 
@@ -149,6 +186,14 @@ The layout direction is forced RTL in `MyPenTheme`.
 - `versionCode = 1000`, `versionName = "1.0.0"`; versioning is documented in
   RELEASES.md.
 - Persian is the only supported UI locale; strings live in
-  `res/values/strings.xml`, theme colors in `ui/theme/Color.kt`.
-- `isMinifyEnabled = false`; `proguard-rules.pro` documents expected keeps
-  if R8 is enabled later.
+  `res/values/strings.xml`, static dark theme colors in `ui/theme/Color.kt`,
+  design tokens in `ui/theme/Dimens.kt`, and Vazirmatn font typography in
+  `ui/theme/Type.kt`.
+- Jalali conversion is a pure integer algorithm valid for 1264–1500 Jalali
+  (well beyond the app's usable range); ISO Gregorian remains the storage format.
+- The home screen widget reads the database on the main thread of the widget
+  update callback (`AppWidgetProvider.onUpdate`); it is bounded to three rows.
+- R8 code shrinking, obfuscation, optimization, and resource shrinking are
+  enabled for release builds (`isMinifyEnabled = true`,
+  `isShrinkResources = true`); `proguard-rules.pro` preserves backup models,
+  `ExpiryCheckWorker`, and Compose metadata.
