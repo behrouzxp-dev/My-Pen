@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Pen</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">داشبورد</string>
+    <string name="nav_inventory">موجودی</string>
+    <string name="nav_history">تاریخچه</string>
+    <string name="nav_settings">تنظیمات</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">نمای کلی موجودی انسولین</string>
+    <string name="total_active_pens">کل قلم‌های فعال و بازنشده</string>
+    <string name="long_acting_pens">انسولین بلنداثر</string>
+    <string name="short_acting_pens">انسولین کوتاه‌اثر</string>
+    <string name="expiring_soon_pens">نزدیک به انقضا (تا ۳۰ روز آینده)</string>
+    <string name="expired_pens">قلم‌های منقضی‌شده</string>
+    <string name="quick_actions">دسترسی سریع</string>
+    <string name="btn_add_pen">افزودن قلم جدید</string>
+    <string name="btn_view_inventory">مشاهده موجودی فعال</string>
+    <string name="expiring_soon_alert_title">هشدار قلم‌های نزدیک به انقضا</string>
+    <string name="expiring_soon_alert_desc">توجه: %1$d قلم انسولین در بازه ۳۰ روز آینده منقضی می‌شوند. لطفاً اولویت مصرف را رعایت فرمایید.</string>
+
+    <!-- Inventory -->
+    <string name="tab_long_acting">بلنداثر</string>
+    <string name="tab_short_acting">کوتاه‌اثر</string>
+    <string name="col_name">نام انسولین</string>
+    <string name="col_expiry">تاریخ انقضا</string>
+    <string name="col_status">وضعیت</string>
+    <string name="col_priority">اولویت</string>
+    <string name="col_days_left">روز تا انقضا</string>
+    <string name="empty_inventory_long">هیچ قلم انسولین بلنداثر در موجودی فعال ثبت نشده است.</string>
+    <string name="empty_inventory_short">هیچ قلم انسولین کوتاه‌اثر در موجودی فعال ثبت نشده است.</string>
+
+    <!-- Types -->
+    <string name="type_long">بلنداثر</string>
+    <string name="type_short">کوتاه‌اثر</string>
+
+    <!-- Statuses -->
+    <string name="status_active_label">موجود</string>
+    <string name="status_opened_label">بازشده</string>
+    <string name="status_defective_label">معیوب</string>
+    <string name="status_expired_label">منقضی‌شده</string>
+
+    <!-- Add Pen Form -->
+    <string name="add_pen_title">ثبت قلم‌های انسولین جدید</string>
+    <string name="field_insulin_name">نام انسولین</string>
+    <string name="field_insulin_name_hint">مثال: لانتوس، نوورپید، لومیر...</string>
+    <string name="field_effect_type">نوع اثر</string>
+    <string name="field_expiry_date">تاریخ انقضا (میلادی)</string>
+    <string name="field_expiry_date_hint">YYYY-MM-DD</string>
+    <string name="field_pen_count">تعداد قلم‌ها</string>
+    <string name="field_pen_count_hint">عدد صحیح مثبت (مثلاً 1 یا 5)</string>
+    <string name="btn_save_pens">ذخیره و ثبت در موجودی</string>
+    <string name="msg_pens_added_success">%1$d قلم با شناسه‌های مستقل با موفقیت در موجودی ثبت شدند.</string>
+    <string name="err_empty_name">لطفاً نام انسولین را وارد نمایید.</string>
+    <string name="err_invalid_type">لطفاً نوع اثر (بلنداثر یا کوتاه‌اثر) را انتخاب فرمایید.</string>
+    <string name="err_invalid_date">لطفاً تاریخ انقضای معتبر با قالب YYYY-MM-DD وارد نمایید.</string>
+    <string name="err_invalid_count">تعداد قلم‌ها باید یک عدد صحیح بزرگ‌تر از صفر باشد.</string>
+
+    <!-- Pen Details -->
+    <string name="pen_details_title">جزئیات قلم انسولین</string>
+    <string name="label_pen_id">شناسه یکتا:</string>
+    <string name="label_pen_name">نام انسولین:</string>
+    <string name="label_pen_type">نوع اثر:</string>
+    <string name="label_pen_expiry">تاریخ انقضا:</string>
+    <string name="label_pen_status">وضعیت فعلی:</string>
+    <string name="label_days_remaining">روزهای باقی‌مانده:</string>
+    <string name="label_priority">اولویت مصرف:</string>
+    <string name="label_entry_date">تاریخ ورود به موجودی:</string>
+    <string name="label_opened_date">تاریخ باز شدن:</string>
+    <string name="label_defective_date">تاریخ ثبت خرابی:</string>
+    <string name="label_defective_reason">دلیل خرابی:</string>
+    <string name="label_pen_history">تاریخچه رویدادهای این قلم</string>
+
+    <!-- Actions -->
+    <string name="btn_edit_pen">ویرایش مشخصات</string>
+    <string name="btn_mark_opened">ثبت باز شدن قلم</string>
+    <string name="btn_mark_defective">ثبت خرابی قلم</string>
+    <string name="btn_delete_permanently">حذف دائمی قلم</string>
+    <string name="dialog_delete_title">تأیید حذف دائمی قلم</string>
+    <string name="dialog_delete_message">هشدار: تمام سوابق و تاریخچه این قلم برای همیشه حذف خواهد شد و این عملیات قابل بازگشت نیست. آیا مطمئن هستید؟</string>
+    <string name="btn_confirm_delete">حذف قطعی</string>
+    <string name="btn_cancel">انصراف</string>
+
+    <!-- Mark Opened Dialog -->
+    <string name="dialog_open_title">ثبت باز شدن قلم</string>
+    <string name="dialog_open_prompt">تاریخ باز شدن قلم را وارد کنید (قالب: YYYY-MM-DD):</string>
+    <string name="btn_confirm_open">ثبت باز شدن</string>
+    <string name="msg_pen_opened">قلم با موفقیت به عنوان «بازشده» ثبت و به تاریخچه منتقل شد.</string>
+
+    <!-- Mark Defective Dialog -->
+    <string name="dialog_defective_title">ثبت قلم معیوب</string>
+    <string name="dialog_defective_prompt">دلیل خرابی یا نقص قلم را شرح دهید:</string>
+    <string name="dialog_defective_hint">مثال: تغییر رنگ مایع، شکستگی پیستون، نشت...</string>
+    <string name="btn_confirm_defective">ثبت خرابی</string>
+    <string name="msg_pen_defective">خرابی قلم ثبت و به تاریخچه منتقل شد.</string>
+
+    <!-- Edit Dialog -->
+    <string name="dialog_edit_title">ویرایش مشخصات قلم</string>
+    <string name="btn_save_changes">ذخیره تغییرات</string>
+    <string name="msg_pen_updated">مشخصات قلم با موفقیت به‌روزرسانی شد.</string>
+
+    <!-- History -->
+    <string name="history_title">تاریخچه رویدادها</string>
+    <string name="filter_all">همه</string>
+    <string name="filter_opened">بازشده</string>
+    <string name="filter_defective">معیوب</string>
+    <string name="filter_expired">منقضی‌شده</string>
+    <string name="empty_history">هیچ رویدادی در تاریخچه ثبت نشده است.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">تنظیمات و پشتیبان‌گیری</string>
+    <string name="section_notifications">تنظیمات اعلان‌های پیش از انقضا</string>
+    <string name="notify_30_days">اعلان ۳۰ روز پیش از انقضا</string>
+    <string name="notify_14_days">اعلان ۱۴ روز پیش از انقضا</string>
+    <string name="notify_7_days">اعلان ۷ روز پیش از انقضا</string>
+    <string name="notify_desc">این اعلان‌ها به کاربر یادآوری می‌کنند که تاریخ انقضای قلم‌های فعال نزدیک است تا اولویت مصرف رعایت شود.</string>
+
+    <string name="section_backup">پشتیبان‌گیری و بازیابی داده‌ها</string>
+    <string name="btn_export_backup">تهیه فایل پشتیبان (JSON)</string>
+    <string name="btn_import_backup">بازیابی اطلاعات از فایل پشتیبان</string>
+    <string name="backup_info">پشتیبان شامل کلیه قلم‌ها، وضعیت‌ها، شناسه‌ها و تاریخچه کامل رویدادها در قالب استاندارد JSON است.</string>
+
+    <string name="dialog_restore_warning_title">هشدار جایگزینی اطلاعات</string>
+    <string name="dialog_restore_warning_message">بازیابی اطلاعات باعث حذف تمام داده‌های فعلی و جایگزینی با اطلاعات فایل پشتیبان می‌شود.\n\nتعداد قلم‌ها در فایل: %1$d\nنسخه ساختار: %2$d\nتاریخ پشتیبان: %3$s\n\nآیا از انجام این عملیات اطمینان کامل دارید؟</string>
+    <string name="btn_confirm_restore">بازیابی قطعی</string>
+    <string name="msg_backup_created">فایل پشتیبان با موفقیت تهیه شد.</string>
+    <string name="msg_restore_success">بازیابی اطلاعات با موفقیت انجام شد.</string>
+    <string name="err_restore_failed">خطا در بازیابی: فایل پشتیبان نامعتبر است یا ساختار آن همخوانی ندارد. داده‌های قبلی حفظ شدند.</string>
+
+    <!-- Expired Pens Dialog/List -->
+    <string name="expired_pens_title">فهرست قلم‌های منقضی‌شده</string>
+    <string name="empty_expired_list">خوشبختانه هیچ قلم منقضی‌شده‌ای وجود ندارد.</string>
+
+    <!-- Medical Disclaimer -->
+    <string name="medical_disclaimer_title">مرزهای ایمنی و سلب مسئولیت پزشکی</string>
+    <string name="medical_disclaimer_text">این برنامه صرفاً یک ابزار مدیریت موجودی و سازمان‌دهی فیزیکی قلم‌های انسولین بر مبنای تاریخ انقضا است. این اپلیکیشن هیچ‌گونه توصیه پزشکی، تجویز دارو، تعیین دوز، جایگزینی نوع انسولین، تشخیص سلامتی یا دستورالعمل مصرف پس از باز شدن ارائه نمی‌دهد. تمام تصمیمات درمانی باید منحصراً توسط پزشک معالج تعیین گردد.</string>
+</resources>
