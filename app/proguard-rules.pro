@@ -1,8 +1,6 @@
 # My Pen — R8/ProGuard rules for release builds.
-#
-# NOTE: `isMinifyEnabled` is currently false in app/build.gradle.kts.
-# Enable R8 only after validating the release build on a device; this file
-# documents the keeps that are expected to be required then.
+# R8 code shrinking, obfuscation, optimization, and resource shrinking are
+# enabled (`isMinifyEnabled = true`, `isShrinkResources = true`) in release builds.
 
 # Keep line numbers for readable stack traces
 -keepattributes SourceFile,LineNumberTable
@@ -11,12 +9,15 @@
 -keepattributes RuntimeVisibleAnnotations,RuntimeInvisibleAnnotations
 -keep class kotlin.Metadata { *; }
 
-# Backup/restore models are (de)serialized manually via org.json; keep them
-# defensively so reflection-based tools keep working
+# Backup/restore models and enums are (de)serialized via org.json; keep them
+# so enum values and model members remain intact
 -keep class com.mypen.app.model.** { *; }
 
-# WorkManager instantiates the worker via its no-arg constructor reflection
--keep class com.mypen.app.notification.ExpiryCheckWorker { *; }
+# WorkManager instantiates the worker via its (Context, WorkerParameters) constructor reflection
+-keep class com.mypen.app.notification.ExpiryCheckWorker {
+    public <init>(android.content.Context, androidx.work.WorkerParameters);
+    *;
+}
 
 # Compose
 -keep class androidx.compose.** { *; }
