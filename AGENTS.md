@@ -192,7 +192,7 @@ For Android projects:
 
 Verify Debug builds.
 Verify Release builds when release configuration is available.
-Check application ID, version information, and APK filename format (Panther Vx.y.z.apk).
+Check application ID, version information, and APK filename format (My Pen Vx.y.z.apk).
 Verify signing configuration without exposing secrets.
 Test installation and startup where possible.
 Never report a successful build unless the build actually completed successfully.
@@ -225,15 +225,15 @@ Use GitHub Releases for approved stable application releases.
 
 For Android projects, release artifacts may include:
 
-APK named [AppName] Vx.y.z.apk (Panther Vx.y.z.apk)
+APK named [AppName] Vx.y.z.apk (My Pen Vx.y.z.apk)
 AAB (when applicable)
-Relevant checksums (Panther Vx.y.z.apk.sha256)
+Relevant checksums (My Pen Vx.y.z.apk.sha256)
 Release notes (including the Persian annotated tag description)
 Rules:
 
 Update documentation (CHANGELOG.md, RELEASES.md, README.md, .github/README.md, and relevant docs/*), submit it with the release Pull Request, and merge it into main prior to creating the release tag (per section 19.1).
 Use version tags such as v1.0.0 with Persian tag descriptions.
-Name output APK files using the exact format [AppName] Vx.y.z.apk — specifically Panther Vx.y.z.apk (e.g., Panther V1.0.2.apk).
+Name output APK files using the exact format [AppName] Vx.y.z.apk — specifically My Pen Vx.y.z.apk (e.g., My Pen V1.0.2.apk).
 Publish releases directly (draft: false) via release.yml once the tag has been approved by the owner.
 Include accurate release notes.
 Upload only verified build artifacts.
@@ -403,7 +403,7 @@ Releases start with the word tag. When the owner sends the word tag, list the av
 Direct release publication (no drafts). Once the owner selects and approves a release tag via the tag workflow (and pre-release documentation is merged on main), release.yml must publish the GitHub Release directly (draft: false). Do not create draft releases.
 Persian Git tag descriptions. Always create annotated release tags (git tag -a vX.Y.Z -m "...") with clear Persian descriptions summarizing the changes in that version.
 Dual README (README.md in English + .github/README.md in Persian). Keep the primary project README.md at the repository root in English for project and tooling use, and maintain a complete Persian (RTL) counterpart at .github/README.md so GitHub renders the Persian README on the repository landing page. Update both files together whenever README-level information changes.
-APK filename format ([AppName] Vx.y.z). Generated APK files must use the exact naming pattern [AppName] Vx.y.z.apk — specifically Panther Vx.y.z.apk (capital V and a single space between Panther and the version, e.g., Panther V1.0.2.apk, with companion checksum Panther V1.0.2.apk.sha256).
+APK filename format ([AppName] Vx.y.z). Generated APK files must use the exact naming pattern [AppName] Vx.y.z.apk — specifically My Pen Vx.y.z.apk (capital V and a single space between My Pen and the version, e.g., My Pen V1.0.2.apk, with companion checksum My Pen V1.0.2.apk.sha256).
 Final Operating Principle
 Work carefully, preserve project history, protect sensitive information, and keep the repository maintainable.
 
