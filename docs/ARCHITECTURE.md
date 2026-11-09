@@ -133,7 +133,9 @@ Single `Activity` (`MainActivity`) with hand-rolled tab navigation
 (`AddPenScreen`, `PenDetailsScreen`, `ExpiredPensScreen`). Screen data is
 collected via `produceState` keyed on a `dataVersion` counter; bumping
 `dataVersion` reloads everything. Repository calls run on `Dispatchers.IO`.
-The layout direction is forced RTL in `MyPenTheme`.
+The layout direction is forced RTL in `MyPenTheme`, which applies a
+permanent static dark color scheme (`Color.kt`) and global **Vazirmatn**
+Persian typography (`Type.kt`, `res/font/vazirmatn_*.ttf`).
 
 ## Known limitations / deliberate decisions
 
@@ -149,6 +151,9 @@ The layout direction is forced RTL in `MyPenTheme`.
 - `versionCode = 1000`, `versionName = "1.0.0"`; versioning is documented in
   RELEASES.md.
 - Persian is the only supported UI locale; strings live in
-  `res/values/strings.xml`, theme colors in `ui/theme/Color.kt`.
-- `isMinifyEnabled = false`; `proguard-rules.pro` documents expected keeps
-  if R8 is enabled later.
+  `res/values/strings.xml`, static dark theme colors in `ui/theme/Color.kt`,
+  and Vazirmatn font typography in `ui/theme/Type.kt`.
+- R8 code shrinking, obfuscation, optimization, and resource shrinking are
+  enabled for release builds (`isMinifyEnabled = true`,
+  `isShrinkResources = true`); `proguard-rules.pro` preserves backup models,
+  `ExpiryCheckWorker`, and Compose metadata.

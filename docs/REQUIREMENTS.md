@@ -64,7 +64,9 @@ judgment call, it is marked *(decision)*.
      (compatibility test fixture in `app/src/test/resources/`).
 
 7. **UI**
-   - Persian (RTL) interface, jetpack Compose. Language is Persian only.
+   - Persian (RTL) interface, Jetpack Compose (Material 3). Language is Persian only.
+   - Permanent, non-switchable **Static Dark Theme** (`darkColorScheme`) across all screens and system dialogs.
+   - Embedded **Vazirmatn** Persian font family applied globally across all text styles.
    - Android 7.0+ (minSdk 24), target 34.
 
 ## Non-functional requirements

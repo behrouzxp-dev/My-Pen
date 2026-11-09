@@ -19,6 +19,8 @@
 ## فناوری‌ها
 
 - Kotlin + Jetpack Compose (Material 3)، چیدمان RTL اجباری
+- تم تاریک استاتیک (Static Dark Theme — دائمی و غیرقابل تغییر) به همراه فونت فارسی توکار **وزیرمتن (Vazirmatn)** (`res/font/vazirmatn_*.ttf`)
+- فعال‌سازی R8 برای کوچک‌سازی، مبهم‌سازی، بهینه‌سازی کد و حذف منابع اضافی در بیلدهای Release (`isMinifyEnabled = true`, `isShrinkResources = true`)
 - SQLite خام از طریق `SQLiteOpenHelper` (سینگلتون)، بدون Room
 - WorkManager برای چک دوره‌ای انقضا
 - مرتب‌سازی/نامرتب‌سازی دستی JSON (`org.json`) برای فایل‌های پشتیبان
@@ -55,7 +57,7 @@ app/src/main/java/com/mypen/app/
 ├── model/                   # InsulinPen، HistoryEvent، اینام‌ها، تنظیمات
 ├── notification/            # NotificationHelper، ExpiryCheckWorker
 ├── ui/screens/              # صفحات Compose (داشبورد، موجودی، ...)
-├── ui/theme/                # رنگ‌بندی (منبع واحد حقیقت رنگ‌ها)
+├── ui/theme/                # تم تاریک استاتیک + تایپوگرافی وزیرمتن
 └── util/                    # DateUtils (منطقهٔ زمانی محلی)، PriorityCalculator
 
 app/src/test/                # تست‌های JVM + fixture پشتیبان v0 (از classpath)

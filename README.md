@@ -28,6 +28,8 @@ stock:
 ## Tech stack
 
 - Kotlin, Jetpack Compose (Material 3), RTL forced layout
+- Static Dark Theme (permanent, non-switchable) with embedded **Vazirmatn** Persian font (`res/font/vazirmatn_*.ttf`)
+- R8 code shrinking, obfuscation, optimization, and resource shrinking enabled for release builds (`isMinifyEnabled = true`, `isShrinkResources = true`)
 - Raw SQLite via `SQLiteOpenHelper` (singleton), no Room
 - WorkManager for periodic expiry checks
 - Manual `org.json` (de)serialization for backups
@@ -66,7 +68,7 @@ app/src/main/java/com/mypen/app/
 ├── model/                   # InsulinPen, HistoryEvent, enums, settings
 ├── notification/            # NotificationHelper, ExpiryCheckWorker
 ├── ui/screens/              # Compose screens (dashboard, inventory, ...)
-├── ui/theme/                # Color scheme (single source of color truth)
+├── ui/theme/                # Static dark color scheme + Vazirmatn typography
 └── util/                    # DateUtils (local TZ), PriorityCalculator
 
 app/src/test/                # JVM unit tests + v0 backup fixture (classpath)

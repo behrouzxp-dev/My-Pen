@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Embedded **Vazirmatn** (v33.003) Persian font family (`vazirmatn_regular.ttf`,
+  `vazirmatn_medium.ttf`, `vazirmatn_bold.ttf`) and global Material 3
+  `AppTypography` (`ui/theme/Type.kt`) applied across all UI screens and
+  components.
+
+### Changed
+
+- Replaced the light theme with a permanent, non-switchable **Static Dark
+  Theme** (`ui/theme/Theme.kt`, `ui/theme/Color.kt`, and
+  `Theme.Material.NoActionBar` in `AndroidManifest.xml`) with dark-mode
+  optimized card, badge, table-header, and status colors.
+- Enabled **R8** code shrinking, obfuscation, optimization, and resource
+  shrinking for release builds (`isMinifyEnabled = true`,
+  `isShrinkResources = true` in `app/build.gradle.kts`) with verified
+  `proguard-rules.pro` keeps.
+
 ## [1.0.0] - 2026-11-09
 
 First stable release. Originally imported as the Kotlin/Android baseline on
