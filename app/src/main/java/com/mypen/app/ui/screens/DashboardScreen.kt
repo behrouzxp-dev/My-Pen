@@ -51,11 +51,23 @@ fun DashboardScreen(
     }
     val urgentPen = ordered.firstOrNull()
 
-    LazyColumn(
+    BoxWithConstraints(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = Spacing.lg, end = Spacing.lg, top = Spacing.sm, bottom = Spacing.xxl),
-        verticalArrangement = Arrangement.spacedBy(Spacing.md)
+        contentAlignment = Alignment.TopCenter
     ) {
+        val isWide = maxWidth >= 640.dp
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(max = 960.dp),
+            contentPadding = PaddingValues(
+                start = Spacing.lg,
+                end = Spacing.lg,
+                top = Spacing.sm,
+                bottom = Spacing.xxl
+            ),
+            verticalArrangement = Arrangement.spacedBy(Spacing.md)
+        ) {
         // 1. Expiring-soon banner
         if (metrics.expiringSoonCount > 0) {
             item("banner") {
@@ -134,51 +146,88 @@ fun DashboardScreen(
             }
         }
 
-        // 4. Per-type metrics
-        item("types") {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
-                MetricCard(
-                    icon = Icons.Filled.Schedule,
-                    label = stringResource(R.string.long_acting_pens),
-                    value = metrics.longActingCount,
-                    accent = typeColor(InsulinType.LONG_ACTING),
-                    caption = stringResource(R.string.metric_tap_for_inventory),
-                    modifier = Modifier.weight(1f),
-                    onClick = { onNavigateToInventory(InsulinType.LONG_ACTING) }
-                )
-                MetricCard(
-                    icon = Icons.Filled.Schedule,
-                    label = stringResource(R.string.short_acting_pens),
-                    value = metrics.shortActingCount,
-                    accent = typeColor(InsulinType.SHORT_ACTING),
-                    caption = stringResource(R.string.metric_tap_for_inventory),
-                    modifier = Modifier.weight(1f),
-                    onClick = { onNavigateToInventory(InsulinType.SHORT_ACTING) }
-                )
+        // 4-5. Metrics: one row of four on wide windows, two rows of two on phones
+        if (isWide) {
+            item("metrics_wide") {
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    MetricCard(
+                        icon = Icons.Filled.Schedule,
+                        label = stringResource(R.string.long_acting_pens),
+                        value = metrics.longActingCount,
+                        accent = typeColor(InsulinType.LONG_ACTING),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNavigateToInventory(InsulinType.LONG_ACTING) }
+                    )
+                    MetricCard(
+                        icon = Icons.Filled.Schedule,
+                        label = stringResource(R.string.short_acting_pens),
+                        value = metrics.shortActingCount,
+                        accent = typeColor(InsulinType.SHORT_ACTING),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNavigateToInventory(InsulinType.SHORT_ACTING) }
+                    )
+                    MetricCard(
+                        icon = Icons.Filled.Warning,
+                        label = stringResource(R.string.expiring_soon_short),
+                        value = metrics.expiringSoonCount,
+                        accent = StatusExpiringSoon,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNavigateToInventory(InsulinType.LONG_ACTING) }
+                    )
+                    MetricCard(
+                        icon = Icons.Filled.EventBusy,
+                        label = stringResource(R.string.expired_pens),
+                        value = metrics.expiredCount,
+                        accent = StatusExpired,
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToExpired
+                    )
+                }
             }
-        }
-
-        // 5. Risk metrics
-        item("risk") {
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
-                MetricCard(
-                    icon = Icons.Filled.Warning,
-                    label = stringResource(R.string.expiring_soon_short),
-                    value = metrics.expiringSoonCount,
-                    accent = StatusExpiringSoon,
-                    caption = stringResource(R.string.metric_within_30_days),
-                    modifier = Modifier.weight(1f),
-                    onClick = { onNavigateToInventory(InsulinType.LONG_ACTING) }
-                )
-                MetricCard(
-                    icon = Icons.Filled.EventBusy,
-                    label = stringResource(R.string.expired_pens),
-                    value = metrics.expiredCount,
-                    accent = StatusExpired,
-                    caption = stringResource(R.string.metric_review_now),
-                    modifier = Modifier.weight(1f),
-                    onClick = onNavigateToExpired
-                )
+        } else {
+            item("types") {
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    MetricCard(
+                        icon = Icons.Filled.Schedule,
+                        label = stringResource(R.string.long_acting_pens),
+                        value = metrics.longActingCount,
+                        accent = typeColor(InsulinType.LONG_ACTING),
+                        caption = stringResource(R.string.metric_tap_for_inventory),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNavigateToInventory(InsulinType.LONG_ACTING) }
+                    )
+                    MetricCard(
+                        icon = Icons.Filled.Schedule,
+                        label = stringResource(R.string.short_acting_pens),
+                        value = metrics.shortActingCount,
+                        accent = typeColor(InsulinType.SHORT_ACTING),
+                        caption = stringResource(R.string.metric_tap_for_inventory),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNavigateToInventory(InsulinType.SHORT_ACTING) }
+                    )
+                }
+            }
+            item("risk") {
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    MetricCard(
+                        icon = Icons.Filled.Warning,
+                        label = stringResource(R.string.expiring_soon_short),
+                        value = metrics.expiringSoonCount,
+                        accent = StatusExpiringSoon,
+                        caption = stringResource(R.string.metric_within_30_days),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNavigateToInventory(InsulinType.LONG_ACTING) }
+                    )
+                    MetricCard(
+                        icon = Icons.Filled.EventBusy,
+                        label = stringResource(R.string.expired_pens),
+                        value = metrics.expiredCount,
+                        accent = StatusExpired,
+                        caption = stringResource(R.string.metric_review_now),
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToExpired
+                    )
+                }
             }
         }
 
@@ -229,6 +278,7 @@ fun DashboardScreen(
                     )
                 }
             }
+        }
         }
     }
 }

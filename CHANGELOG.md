@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **History timeline** grouped by day with per-type event counts.
 - **Settings redesign** with grouped rows, an About dialog (version, features,
   disclaimer) and snackbar-based feedback.
+- **Adaptive layout** on the dashboard: the four metric tiles share one row and
+  the content width is capped on tablets and foldables.
 - **Loading skeleton** instead of a blocking spinner on first launch.
 - Embedded **Vazirmatn** (v33.003) Persian font family (`vazirmatn_regular.ttf`,
   `vazirmatn_medium.ttf`, `vazirmatn_bold.ttf`) and global Material 3
