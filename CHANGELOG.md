@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   shrinking for release builds (`isMinifyEnabled = true`,
   `isShrinkResources = true` in `app/build.gradle.kts`) with verified
   `proguard-rules.pro` keeps.
+- Replaced the application launcher icon with the new multi-density adaptive
+  and legacy launcher icon set (`mipmap-*/ic_launcher*.png`,
+  `mipmap-anydpi-v26/ic_launcher*.xml`) and removed the old
+  `drawable/ic_insulin_pen.xml` vector icon.
 
 ## [1.0.0] - 2026-11-09
 
