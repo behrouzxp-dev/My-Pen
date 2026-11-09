@@ -16,6 +16,8 @@
 *.zip binary
 *.apk binary
 *.aab binary
+*.ttf binary
+*.otf binary
 
 # Gradle wrapper scripts (when added) must remain LF
 gradlew text eol=lf
