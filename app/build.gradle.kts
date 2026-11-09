@@ -22,11 +22,11 @@ val hasReleaseSigning = file(releaseStoreFilePath).exists() &&
     !releaseKeyPassword.isNullOrBlank()
 
 android {
-    namespace = "com.arena.mypen"
+    namespace = "com.mypen.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.arena.mypen"
+        applicationId = "com.mypen.app"
         minSdk = 24
         targetSdk = 34
         versionCode = 1000

@@ -77,8 +77,9 @@ and intentionally independent of `versionName`.
 
 ## Release history
 
-- **v1.0.0** — baseline import (applicationId `com.arena.mypen`,
-  versionCode 1000). No GitHub Release has been published yet; the first
+- **v1.0.0** — baseline import; the application ID was changed from
+  `com.arena.mypen` to `com.mypen.app` before the first stable release
+  (versionCode remains 1000). No GitHub Release has been published yet; the first
   tag will be the owner's choice (`tag` workflow).
 
 ## Notes

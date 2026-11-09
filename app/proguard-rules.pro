@@ -13,10 +13,10 @@
 
 # Backup/restore models are (de)serialized manually via org.json; keep them
 # defensively so reflection-based tools keep working
--keep class com.arena.mypen.model.** { *; }
+-keep class com.mypen.app.model.** { *; }
 
 # WorkManager instantiates the worker via its no-arg constructor reflection
--keep class com.arena.mypen.notification.ExpiryCheckWorker { *; }
+-keep class com.mypen.app.notification.ExpiryCheckWorker { *; }
 
 # Compose
 -keep class androidx.compose.** { *; }
