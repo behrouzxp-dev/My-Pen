@@ -2,6 +2,17 @@
 <resources>
     <string name="app_name">My Pen</string>
 
+    <!-- Common actions -->
+    <string name="action_back">بازگشت</string>
+    <string name="action_more">گزینه‌های بیشتر</string>
+    <string name="action_dismiss">بستن</string>
+    <string name="action_clear_search">پاک کردن جست‌وجو</string>
+    <string name="action_pick_date">انتخاب تاریخ</string>
+    <string name="action_decrease">کاهش تعداد</string>
+    <string name="action_increase">افزایش تعداد</string>
+    <string name="btn_cancel">انصراف</string>
+    <string name="btn_close">بستن</string>
+
     <!-- Navigation -->
     <string name="nav_dashboard">داشبورد</string>
     <string name="nav_inventory">موجودی</string>
@@ -10,25 +21,42 @@
 
     <!-- Dashboard -->
     <string name="total_active_pens">کل قلم‌های فعال و بازنشده</string>
+    <string name="dashboard_ready_to_use">قلم آماده مصرف</string>
     <string name="long_acting_pens">انسولین بلنداثر</string>
     <string name="short_acting_pens">انسولین کوتاه‌اثر</string>
     <string name="expired_pens">قلم‌های منقضی‌شده</string>
+    <string name="expiring_soon_short">نزدیک به انقضا</string>
     <string name="quick_actions">دسترسی سریع</string>
     <string name="btn_add_pen">افزودن قلم جدید</string>
-    <string name="btn_view_inventory">مشاهده موجودی فعال</string>
+    <string name="btn_view_inventory">مشاهده موجودی</string>
     <string name="expiring_soon_alert_title">هشدار قلم‌های نزدیک به انقضا</string>
     <string name="expiring_soon_alert_desc">توجه: %1$d قلم انسولین در بازه ۳۰ روز آینده منقضی می‌شوند. لطفاً اولویت مصرف را رعایت فرمایید.</string>
+    <string name="dashboard_priority_section">اولویت مصرف امروز</string>
+    <string name="dashboard_empty_title">هنوز قلمی ثبت نشده است</string>
+    <string name="dashboard_empty_desc">با ثبت اولین قلم انسولین، اولویت مصرف و تاریخ انقضا به‌صورت خودکار محاسبه می‌شود.</string>
+    <string name="metric_tap_for_inventory">برای مشاهده موجودی لمس کنید</string>
+    <string name="metric_within_30_days">در ۳۰ روز آینده</string>
+    <string name="metric_review_now">برای بررسی لمس کنید</string>
+    <string name="dashboard_insight_section">نمای کلی انقضا</string>
+    <string name="insight_title">پراکندگی انقضا در ۹۰ روز آینده</string>
+    <string name="insight_desc">تعداد قلم‌هایی که در هر بازه ۱۵ روزه منقضی می‌شوند.</string>
+    <string name="insight_footnote">محور افقی: روزهای باقی‌مانده تا انقضا</string>
+    <string name="priority_short">اولویت %1$s</string>
+    <string name="unit_day">روز</string>
+    <string name="label_expiry_short">تاریخ انقضا</string>
 
     <!-- Inventory -->
-    <string name="tab_long_acting">بلنداثر</string>
-    <string name="tab_short_acting">کوتاه‌اثر</string>
-    <string name="col_name">نام انسولین</string>
-    <string name="col_expiry">تاریخ انقضا</string>
-    <string name="col_status">وضعیت</string>
-    <string name="col_priority">اولویت</string>
-    <string name="col_days_left">روز تا انقضا</string>
     <string name="empty_inventory_long">هیچ قلم انسولین بلنداثر در موجودی فعال ثبت نشده است.</string>
     <string name="empty_inventory_short">هیچ قلم انسولین کوتاه‌اثر در موجودی فعال ثبت نشده است.</string>
+    <string name="inventory_empty_title">موجودی خالی است</string>
+    <string name="inventory_count_subtitle">%1$s قلم در این دسته</string>
+    <string name="search_hint">جست‌وجوی نام انسولین…</string>
+    <string name="search_empty_title">نتیجه‌ای یافت نشد</string>
+    <string name="search_empty_desc">عبارت جست‌وجو را تغییر دهید یا فیلتر را پاک کنید.</string>
+    <string name="sort_expiry">نزدیک‌ترین انقضا</string>
+    <string name="sort_name">نام</string>
+    <string name="sort_newest">تازه‌ترین ورود</string>
+    <string name="expiry_on_date">انقضا: %1$s</string>
 
     <!-- Types -->
     <string name="type_long">بلنداثر</string>
@@ -38,22 +66,40 @@
     <string name="status_expired_label">منقضی‌شده</string>
 
     <!-- Add Pen Form -->
-    <string name="add_pen_title">ثبت قلم‌های انسولین جدید</string>
+    <string name="add_pen_title">ثبت قلم انسولین جدید</string>
+    <string name="form_section_details">مشخصات قلم</string>
+    <string name="form_section_expiry">تاریخ انقضا</string>
+    <string name="form_jalali_hint">تاریخ به شمسی انتخاب می‌شود و برای حفظ سازگاری، به‌صورت میلادی ذخیره می‌گردد.</string>
     <string name="field_insulin_name">نام انسولین</string>
-    <string name="field_insulin_name_hint">مثال: لانتوس، نوورپید، لومیر...</string>
+    <string name="field_insulin_name_hint">مثال: لانتوس، نوورپید، لومیر…</string>
     <string name="field_effect_type">نوع اثر</string>
-    <string name="field_expiry_date">تاریخ انقضا (میلادی)</string>
-    <string name="field_expiry_date_hint">YYYY-MM-DD</string>
+    <string name="field_expiry_date">تاریخ انقضا</string>
+    <string name="field_expiry_date_hint">انتخاب تاریخ</string>
+    <string name="field_date_placeholder">انتخاب تاریخ</string>
     <string name="field_pen_count">تعداد قلم‌ها</string>
-    <string name="field_pen_count_hint">عدد صحیح مثبت (مثلاً 1 یا 5)</string>
+    <string name="field_pen_count_hint">بین ۱ تا ۱۰۰ قلم</string>
     <string name="btn_save_pens">ذخیره و ثبت در موجودی</string>
     <string name="err_empty_name">لطفاً نام انسولین را وارد نمایید.</string>
-    <string name="err_invalid_date">لطفاً تاریخ انقضای معتبر با قالب YYYY-MM-DD وارد نمایید.</string>
-    <string name="err_invalid_count">تعداد قلم‌ها باید یک عدد صحیح بزرگ‌تر از صفر باشد.</string>
-    <string name="err_count_too_large">حداکثر 100 قلم در هر ثبت امکان‌پذیر است.</string>
+    <string name="err_invalid_date">لطفاً تاریخ انقضا را انتخاب نمایید.</string>
+    <string name="err_invalid_count">تعداد قلم‌ها باید عددی بزرگ‌تر از صفر باشد.</string>
+    <string name="err_count_too_large">حداکثر ۱۰۰ قلم در هر ثبت امکان‌پذیر است.</string>
+    <string name="msg_pens_added">قلم‌های انسولین با موفقیت به موجودی اضافه شدند.</string>
+    <string name="dialog_discard_title">انصراف از ثبت</string>
+    <string name="dialog_discard_message">اطلاعات وارد شده ذخیره نشده است. آیا می‌خواهید فرم را ترک کنید؟</string>
+    <string name="btn_discard">ترک فرم</string>
+
+    <!-- Jalali date picker -->
+    <string name="date_picker_previous_year">سال قبل</string>
+    <string name="date_picker_next_year">سال بعد</string>
+    <string name="date_picker_previous_month">ماه قبل</string>
+    <string name="date_picker_next_month">ماه بعد</string>
+    <string name="date_picker_today">امروز</string>
+    <string name="btn_confirm_date">تأیید تاریخ</string>
 
     <!-- Pen Details -->
     <string name="pen_details_title">جزئیات قلم انسولین</string>
+    <string name="section_pen_information">اطلاعات قلم</string>
+    <string name="section_pen_actions">عملیات روی این قلم</string>
     <string name="label_pen_id">شناسه یکتا:</string>
     <string name="label_pen_expiry">تاریخ انقضا:</string>
     <string name="label_days_remaining">روزهای باقی‌مانده:</string>
@@ -62,6 +108,10 @@
     <string name="label_defective_date">تاریخ ثبت خرابی:</string>
     <string name="label_defective_reason">دلیل خرابی:</string>
     <string name="label_pen_history">تاریخچه رویدادهای این قلم</string>
+    <string name="value_not_set">ثبت نشده</string>
+    <string name="pen_history_empty">هنوز رویدادی برای این قلم ثبت نشده است.</string>
+    <string name="pen_not_found_title">قلم مورد نظر یافت نشد</string>
+    <string name="pen_not_found_desc">این قلم حذف شده یا شناسه آن معتبر نیست.</string>
 
     <!-- Actions -->
     <string name="btn_edit_pen">ویرایش مشخصات</string>
@@ -71,17 +121,17 @@
     <string name="dialog_delete_title">تأیید حذف دائمی قلم</string>
     <string name="dialog_delete_message">هشدار: تمام سوابق و تاریخچه این قلم برای همیشه حذف خواهد شد و این عملیات قابل بازگشت نیست. آیا مطمئن هستید؟</string>
     <string name="btn_confirm_delete">حذف قطعی</string>
-    <string name="btn_cancel">انصراف</string>
 
     <!-- Mark Opened Dialog -->
     <string name="dialog_open_title">ثبت باز شدن قلم</string>
-    <string name="dialog_open_prompt">تاریخ باز شدن قلم را وارد کنید (قالب: YYYY-MM-DD):</string>
+    <string name="dialog_open_prompt">تاریخ باز شدن قلم را انتخاب کنید.</string>
+    <string name="dialog_open_date_label">تاریخ باز شدن</string>
     <string name="btn_confirm_open">ثبت باز شدن</string>
 
     <!-- Mark Defective Dialog -->
     <string name="dialog_defective_title">ثبت قلم معیوب</string>
     <string name="dialog_defective_prompt">دلیل خرابی یا نقص قلم را شرح دهید:</string>
-    <string name="dialog_defective_hint">مثال: تغییر رنگ مایع، شکستگی پیستون، نشت...</string>
+    <string name="dialog_defective_hint">مثال: تغییر رنگ مایع، شکستگی پیستون، نشت…</string>
     <string name="btn_confirm_defective">ثبت خرابی</string>
 
     <!-- Edit Dialog -->
@@ -94,17 +144,26 @@
     <string name="filter_defective">معیوب</string>
     <string name="filter_expired">منقضی‌شده</string>
     <string name="empty_history">هیچ رویدادی در تاریخچه ثبت نشده است.</string>
+    <string name="history_empty_title">تاریخچه خالی است</string>
+    <string name="history_events_count">%1$s رویداد</string>
+    <string name="history_count_subtitle">%1$s رویداد ثبت شده</string>
+    <string name="insulin_pen_default">قلم انسولین</string>
 
     <!-- Settings -->
     <string name="section_notifications">تنظیمات اعلان‌های پیش از انقضا</string>
     <string name="notify_30_days">اعلان ۳۰ روز پیش از انقضا</string>
     <string name="notify_14_days">اعلان ۱۴ روز پیش از انقضا</string>
     <string name="notify_7_days">اعلان ۷ روز پیش از انقضا</string>
+    <string name="notify_30_desc">یادآوری زودهنگام برای برنامه‌ریزی مصرف</string>
+    <string name="notify_14_desc">یادآوری میانی برای قلم‌های نزدیک به انقضا</string>
+    <string name="notify_7_desc">یادآوری نهایی در هفته آخر</string>
     <string name="notify_desc">این اعلان‌ها به کاربر یادآوری می‌کنند که تاریخ انقضای قلم‌های فعال نزدیک است تا اولویت مصرف رعایت شود.</string>
 
     <string name="section_backup">پشتیبان‌گیری و بازیابی داده‌ها</string>
     <string name="btn_export_backup">تهیه فایل پشتیبان (JSON)</string>
     <string name="btn_import_backup">بازیابی اطلاعات از فایل پشتیبان</string>
+    <string name="backup_export_desc">ذخیره یا ارسال نسخه پشتیبان کامل</string>
+    <string name="backup_import_desc">جایگزینی داده‌های فعلی با فایل پشتیبان</string>
     <string name="backup_info">پشتیبان شامل کلیه قلم‌ها، وضعیت‌ها، شناسه‌ها و تاریخچه کامل رویدادها در قالب استاندارد JSON است.</string>
 
     <string name="dialog_restore_warning_title">هشدار جایگزینی اطلاعات</string>
@@ -112,12 +171,42 @@
     <string name="btn_confirm_restore">بازیابی قطعی</string>
     <string name="msg_backup_created">فایل پشتیبان با موفقیت تهیه شد.</string>
     <string name="msg_restore_success">بازیابی اطلاعات با موفقیت انجام شد.</string>
+    <string name="msg_backup_schema_mismatch">نسخه قالب پشتیبان ناسازگار است</string>
+    <string name="msg_read_error">خطا در خواندن فایل</string>
+    <string name="msg_export_error">خطا در صدور فایل پشتیبان</string>
+    <string name="msg_restore_error">خطا در بازیابی اطلاعات</string>
 
-    <!-- Expired Pens Dialog/List -->
+    <string name="section_app_info">درباره برنامه</string>
+    <string name="about_title">درباره My Pen</string>
+    <string name="about_subtitle">مدیریت هوشمند موجودی انسولین</string>
+    <string name="about_version">نسخه %1$s</string>
+    <string name="about_description">My Pen یک ابزار آفلاین برای مدیریت موجودی قلم‌های انسولین، اولویت مصرف و یادآوری تاریخ انقضا است. تمام داده‌ها فقط روی همین دستگاه ذخیره می‌شوند.</string>
+    <string name="about_features">امکانات: داشبورد اولویت مصرف، موجودی تفکیک‌شده بر اساس نوع انسولین، تاریخچه کامل رویدادها، اعلان‌های پیش از انقضا، پشتیبان‌گیری JSON و ویجت صفحه اصلی.</string>
+    <string name="settings_version">نسخه برنامه</string>
+
+    <!-- Expired Pens -->
     <string name="expired_pens_title">فهرست قلم‌های منقضی‌شده</string>
+    <string name="expired_pens_count">%1$s قلم</string>
+    <string name="expired_empty_title">همه چیز مرتب است</string>
     <string name="empty_expired_list">خوشبختانه هیچ قلم منقضی‌شده‌ای وجود ندارد.</string>
+
+    <!-- Operation feedback -->
+    <string name="msg_operation_failed">عملیات انجام نشد.</string>
+    <string name="msg_pen_opened">باز شدن قلم ثبت شد.</string>
+    <string name="msg_pen_updated">تغییرات قلم ذخیره شد.</string>
+    <string name="msg_pen_deleted">قلم به‌طور دائمی حذف شد.</string>
+    <string name="msg_pen_defective">خرابی قلم ثبت شد.</string>
+
+    <!-- Notifications -->
+    <string name="notification_action_opened">باز شد</string>
 
     <!-- Medical Disclaimer -->
     <string name="medical_disclaimer_title">مرزهای ایمنی و سلب مسئولیت پزشکی</string>
     <string name="medical_disclaimer_text">این برنامه صرفاً یک ابزار مدیریت موجودی و سازمان‌دهی فیزیکی قلم‌های انسولین بر مبنای تاریخ انقضا است. این اپلیکیشن هیچ‌گونه توصیه پزشکی، تجویز دارو، تعیین دوز، جایگزینی نوع انسولین، تشخیص سلامتی یا دستورالعمل مصرف پس از باز شدن ارائه نمی‌دهد. تمام تصمیمات درمانی باید منحصراً توسط پزشک معالج تعیین گردد.</string>
+
+    <!-- Home screen widget -->
+    <string name="widget_description">نمایش قلم‌هایی که به‌زودی منقضی می‌شوند</string>
+    <string name="widget_title">My Pen</string>
+    <string name="widget_subtitle">قلم‌های نزدیک به انقضا</string>
+    <string name="widget_empty">هیچ قلم فعالی در موجودی نیست.</string>
 </resources>
