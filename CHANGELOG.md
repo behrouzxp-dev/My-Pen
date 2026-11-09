@@ -43,6 +43,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Application ID (and `namespace`) changed from `com.arena.mypen` to
+  `com.mypen.app`, before the first stable release. The database engine,
+  file names and backup format are unchanged; existing local data is
+  unaffected because the database file is keyed by app sandbox, and this
+  change precedes any published build.
 - The notification small icon is a branded monochrome vector
   (`ic_notification`) instead of a platform framework icon.
 - Add/Edit validation messages use string resources.

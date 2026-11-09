@@ -5,7 +5,7 @@ consumption priority, notifications, and backup/restore.
 
 ## Overview
 
-My Pen (`com.arena.mypen`) helps people on insulin therapy manage their pen
+My Pen (`com.mypen.app`) helps people on insulin therapy manage their pen
 stock:
 
 - **Inventory** of long-acting and short-acting insulin pens, with per-pen
@@ -59,7 +59,7 @@ CI runs the same steps on every pull request targeting `main`
 ## Project structure
 
 ```
-app/src/main/java/com/arena/mypen/
+app/src/main/java/com/mypen/app/
 ├── MainActivity.kt          # App shell, navigation, background data loading
 ├── MyPenApp.kt              # Application: notification channel + periodic work
 ├── data/                    # AppDatabase (SQLite) + PenRepository
