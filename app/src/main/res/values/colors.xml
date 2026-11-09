@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Window / splash -->
+    <color name="window_background">#FF0A111C</color>
+
+    <!-- Home screen widget (must match the Compose palette in Color.kt) -->
+    <color name="widget_background_color">#FF141F2E</color>
+    <color name="widget_text_primary">#FFE9EFF7</color>
+    <color name="widget_text_muted">#FFA6B6C9</color>
+    <color name="widget_divider">#FF243244</color>
+    <color name="widget_accent_ok">#FF4ADE80</color>
+    <color name="widget_accent_warning">#FFFBBF24</color>
+    <color name="widget_accent_expired">#FFF87171</color>
+</resources>

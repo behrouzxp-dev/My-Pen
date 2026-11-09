@@ -19,6 +19,10 @@
     *;
 }
 
+# App widget provider is instantiated by the system through the manifest
+-keep class com.mypen.app.widget.** { *; }
+-keep class com.mypen.app.notification.NotificationActionReceiver { *; }
+
 # Compose
 -keep class androidx.compose.** { *; }
 -dontwarn androidx.compose.**

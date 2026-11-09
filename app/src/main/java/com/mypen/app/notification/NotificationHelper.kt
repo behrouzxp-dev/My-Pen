@@ -20,6 +20,7 @@ import com.mypen.app.R
 import com.mypen.app.data.PenRepository
 import com.mypen.app.model.InsulinPen
 import com.mypen.app.util.DateUtils
+import com.mypen.app.util.PersianText
 import java.util.concurrent.TimeUnit
 
 object NotificationHelper {
@@ -94,14 +95,19 @@ object NotificationHelper {
 
     private fun sendNotification(context: Context, pen: InsulinPen, thresholdDays: Int): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 return false
             }
         }
 
         val intent = Intent(context, MainActivity::class.java).apply {
-            putExtra("OPEN_TAB", "INVENTORY")
-            putExtra("PEN_TYPE", pen.type.name)
+            putExtra(MainActivity.EXTRA_OPEN_TAB, MainActivity.OPEN_TAB_INVENTORY)
+            putExtra(MainActivity.EXTRA_PEN_TYPE, pen.type.name)
+            putExtra(MainActivity.EXTRA_PEN_ID, pen.id)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
@@ -114,8 +120,23 @@ object NotificationHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val title = "یادآوری انقضای انسولین (${DateUtils.formatEnglish(thresholdDays)} روز باقی‌مانده)"
-        val message = "قلم ${pen.name} (${pen.type.persianLabel}) در تاریخ ${pen.expiryDate} منقضی می‌شود. لطفاً اولویت مصرف را رعایت فرمایید."
+        val markOpenedIntent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = NotificationActionReceiver.ACTION_MARK_OPENED
+            putExtra(NotificationActionReceiver.EXTRA_PEN_ID, pen.id)
+            putExtra(NotificationActionReceiver.EXTRA_NOTIFICATION_ID, requestCode)
+        }
+        val markOpenedPendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode + 1,
+            markOpenedIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val title = "یادآوری انقضای انسولین (" +
+            "${PersianText.number(thresholdDays)} روز باقی‌مانده)"
+        val message = "قلم ${pen.name} (${pen.type.persianLabel}) در تاریخ " +
+            "${DateUtils.displayDateLong(pen.expiryDate)} منقضی می‌شود. " +
+            "لطفاً اولویت مصرف را رعایت فرمایید."
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
@@ -124,6 +145,11 @@ object NotificationHelper {
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
+            .addAction(
+                0,
+                context.getString(R.string.notification_action_opened),
+                markOpenedPendingIntent
+            )
             .setAutoCancel(true)
 
         return try {
