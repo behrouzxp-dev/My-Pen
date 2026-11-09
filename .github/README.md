@@ -15,11 +15,17 @@
 - **انتقال خودکار به منقضی‌شده**: قلم‌هایی که تاریخ انقضایشان گذشته به‌طور خودکار به وضعیت `EXPIRED` منتقل می‌شوند (به ازای هر قلم یک رویداد تاریخچه ثبت می‌شود).
 - **تاریخچه**: ثبت تمام رویدادها (ورود، باز شدن، خرابی، انقضا، ویرایش).
 - **پشتیبان‌گیری و بازیابی**: خروجی/ورود کامل دیتابیس به‌صورت JSON نسخه‌دار (`schemaVersion: 1`). بازیابی اتمیک است و پس از تأیید، همهٔ داده‌ها جایگزین می‌شوند.
+- **تاریخ شمسی**: نمایش همهٔ تاریخ‌ها به تقویم هجری شمسی با ارقام فارسی و برچسب‌های نسبی («۱۲ روز مانده»)، در حالی که ذخیره‌سازی به‌صورت میلادی ISO می‌ماند تا دیتابیس و پشتیبان‌ها سازگار بمانند. انتخاب تاریخ با یک تقویم شمسی هماهنگ با تم برنامه انجام می‌شود.
+- **ویجت صفحهٔ خانه**: سه قلم نزدیک‌ترین به انقضا، همیشه در یک نگاه.
+- **اعلان‌های اقدام‌پذیر**: ثبت «باز شد» برای یک قلم مستقیماً از روی اعلان.
 
 ## فناوری‌ها
 
 - Kotlin + Jetpack Compose (Material 3)، چیدمان RTL اجباری
 - تم تاریک استاتیک (Static Dark Theme — دائمی و غیرقابل تغییر) به همراه فونت فارسی توکار **وزیرمتن (Vazirmatn)** (`res/font/vazirmatn_*.ttf`)
+- سیستم طراحی با توکن‌ها و کتابخانهٔ کامپوننت‌های قابل استفادهٔ مجدد (`ui/theme`، `ui/components`) — رجوع کنید به [docs/DESIGN_SYSTEM.md](../docs/DESIGN_SYSTEM.md)
+- گراف ناوبری با `navigation-compose`، انتقال‌های انیمیشنی، چیدمان edge-to-edge و صفحهٔ Splash (`androidx.core:core-splashscreen`)
+- تبدیل تقویم هجری شمسی و قالب‌بندی ارقام فارسی به‌صورت درون‌پروژه‌ای (بدون وابستگی)
 - فعال‌سازی R8 برای کوچک‌سازی، مبهم‌سازی، بهینه‌سازی کد و حذف منابع اضافی در بیلدهای Release (`isMinifyEnabled = true`, `isShrinkResources = true`)
 - SQLite خام از طریق `SQLiteOpenHelper` (سینگلتون)، بدون Room
 - WorkManager برای چک دوره‌ای انقضا
@@ -51,14 +57,17 @@ CI روی هر Pull Request به شاخهٔ `main` همین مراحل را اج
 
 ```
 app/src/main/java/com/mypen/app/
-├── MainActivity.kt          # پوستهٔ برنامه، ناوبری، بارگذاری پس‌زمینهٔ داده‌ها
+├── MainActivity.kt          # اکتیویتی edge-to-edge، مدیریت intent و deep-link
 ├── MyPenApp.kt              # کلاس Application: ساخت channel اعلان + کار دوره‌ای
 ├── data/                    # AppDatabase (SQLite) + PenRepository
 ├── model/                   # InsulinPen، HistoryEvent، اینام‌ها، تنظیمات
-├── notification/            # NotificationHelper، ExpiryCheckWorker
+├── notification/            # NotificationHelper، ExpiryCheckWorker، گیرندهٔ اقدام اعلان
+├── ui/nav/                  # تعریف مسیرها + NavHost و پوستهٔ برنامه
+├── ui/components/           # کامپوننت‌های سیستم طراحی (کارت، چیپ، تقویم، ...)
 ├── ui/screens/              # صفحات Compose (داشبورد، موجودی، ...)
-├── ui/theme/                # تم تاریک استاتیک + تایپوگرافی وزیرمتن
-└── util/                    # DateUtils (منطقهٔ زمانی محلی)، PriorityCalculator
+├── ui/theme/                # پالت رنگ، تایپوگرافی، شکل‌ها، توکن‌ها، معناشناسی رنگ
+├── util/                    # DateUtils، JalaliDate، PersianText، PriorityCalculator
+└── widget/                  # ویجت صفحهٔ خانه (RemoteViews)
 
 app/src/test/                # تست‌های JVM + fixture پشتیبان v0 (از classpath)
 ```
@@ -67,6 +76,7 @@ app/src/test/                # تست‌های JVM + fixture پشتیبان v0 (
 
 - [ARCHITECTURE.md](../docs/ARCHITECTURE.md) — معماری، مدل داده، فرمت فایل پشتیبان
 - [REQUIREMENTS.md](../docs/REQUIREMENTS.md) — نیازمندی‌های تابعی و غیرتابعی
+- [DESIGN_SYSTEM.md](../docs/DESIGN_SYSTEM.md) — رنگ، تایپوگرافی، فاصله‌ها، حرکت و کامپوننت‌ها
 - [CHANGELOG.md](../CHANGELOG.md) — تاریخچهٔ تغییرات (Keep a Changelog + SemVer)
 - [RELEASES.md](../RELEASES.md) — فرآیند انتشار و نام‌گذاری آرتیفکت‌ها
 - [SECURITY.md](../SECURITY.md) — سیاست کلید امضا و گزارش‌ اشکالات امنیتی

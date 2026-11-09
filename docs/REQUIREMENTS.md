@@ -32,7 +32,27 @@ judgment call, it is marked *(decision)*.
      EXPIRED.
    - Quick navigation to add-pen, inventory and the expired list.
 
-4. **History**
+4. **User interface (design system)**
+   - Single design system: neutral surface scale with colour reserved for status
+     and interactive elements; no decorative coloured card borders.
+   - Vazirmatn typography for every Material 3 slot, with Persian-tuned line
+     height and zero letter tracking.
+   - Persian digits for all user-visible numbers.
+   - Jalali (Solar Hijri) dates for display and input; ISO Gregorian storage.
+   - Jalali date picker in place of the platform (Gregorian) picker.
+   - Snackbar feedback (with actions) instead of toasts.
+   - Static, non-switchable dark theme; no light theme and no dynamic colour.
+   - Themed empty states, loading skeleton, countdown ring, shelf-life bar and
+     expiry-distribution chart on the dashboard.
+   - Inventory supports search, three sort orders, segmented type switching and
+     per-pen quick actions; history groups events by day with type counts.
+   - Edge-to-edge layout, animated navigation transitions and a splash screen.
+   - Home screen widget listing the three pens closest to expiry.
+   - Actionable expiry notifications ("opened" inline action).
+   - Every meaningful icon exposes a `contentDescription`; touch targets are at
+     least 48 dp.
+
+5. **History**
    - Every state change appends a history event (`ENTRY`, `OPENED`,
      `DEFECTIVE`, `EXPIRED`, `EDITED`) with date, timestamp and Persian
      description.
@@ -40,7 +60,7 @@ judgment call, it is marked *(decision)*.
    - Permanent delete removes the pen **and** all of its events and
      notification rows.
 
-5. **Notifications**
+6. **Notifications**
    - User-configurable thresholds at 30, 14 and 7 days before expiry
      (toggles, persisted in `settings` table).
    - Each enabled threshold notifies **once per pen** when the pen comes
@@ -52,7 +72,7 @@ judgment call, it is marked *(decision)*.
    - Requires `POST_NOTIFICATIONS` on Android 13+; denied permission
      silently suppresses notifications.
 
-6. **Backup & restore**
+7. **Backup & restore**
    - Export full database to a versioned JSON document
      (`schemaVersion: 1`, see ARCHITECTURE.md) and share it via the system
      share sheet (JSON file named `mypen_backup_yyyyMMdd.json`).
@@ -63,7 +83,7 @@ judgment call, it is marked *(decision)*.
    - v0 backups (same format, exported 2026-10-18) are supported
      (compatibility test fixture in `app/src/test/resources/`).
 
-7. **UI**
+8. **UI language and accessibility**
    - Persian (RTL) interface, Jetpack Compose (Material 3). Language is Persian only.
    - Permanent, non-switchable **Static Dark Theme** (`darkColorScheme`) across all screens and system dialogs.
    - Embedded **Vazirmatn** Persian font family applied globally across all text styles.
