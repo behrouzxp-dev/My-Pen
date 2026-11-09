@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -17,20 +18,29 @@ import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import com.arena.mypen.data.PenRepository
+import com.arena.mypen.model.DashboardMetrics
 import com.arena.mypen.model.EventType
+import com.arena.mypen.model.HistoryEvent
 import com.arena.mypen.model.InsulinPen
 import com.arena.mypen.model.InsulinType
+import com.arena.mypen.model.NotificationSettings
 import com.arena.mypen.notification.NotificationHelper
 import com.arena.mypen.ui.screens.*
 import com.arena.mypen.ui.theme.MyPenTheme
 import com.arena.mypen.ui.theme.PrimaryBlue
 import com.arena.mypen.ui.theme.SurfaceWhite
 import com.arena.mypen.util.DateUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 enum class NavigationTab {
     DASHBOARD,
@@ -38,6 +48,18 @@ enum class NavigationTab {
     HISTORY,
     SETTINGS
 }
+
+/**
+ * Immutable snapshot of everything the main tabs need, loaded off the main
+ * thread in a single background pass.
+ */
+private data class AppUiData(
+    val today: String,
+    val metrics: DashboardMetrics,
+    val activePens: List<InsulinPen>,
+    val historyEvents: List<HistoryEvent>,
+    val settings: NotificationSettings
+)
 
 class MainActivity : ComponentActivity() {
 
@@ -62,7 +84,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        NotificationHelper.checkAndSendNotifications(this)
+        // Never touch the database or post notifications on the UI thread.
+        lifecycleScope.launch(Dispatchers.IO) {
+            runCatching { NotificationHelper.checkAndSendNotifications(this@MainActivity) }
+        }
     }
 
     private fun parseInitialTab(intent: Intent?): NavigationTab {
@@ -94,6 +119,9 @@ fun AppContent(
     initialTab: NavigationTab,
     initialType: InsulinType
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     var currentTab by remember { mutableStateOf(initialTab) }
     var inventoryType by remember { mutableStateOf(initialType) }
 
@@ -104,25 +132,43 @@ fun AppContent(
 
     // State triggering refresh across screens
     var dataVersion by remember { mutableStateOf(0) }
-
-    val today = remember(dataVersion) { DateUtils.todayDate() }
-    val metrics = remember(dataVersion) { repository.getDashboardMetrics(today) }
-    val activePens = remember(dataVersion, inventoryType) { repository.getActivePens(inventoryType, today) }
     var historyFilter by remember { mutableStateOf<EventType?>(null) }
-    val historyEvents = remember(dataVersion, historyFilter) { repository.getAllHistory(historyFilter) }
-    val settings = remember(dataVersion) { repository.getNotificationSettings() }
+
+    // Load all tab data off the main thread. Recomposes only when inputs change.
+    val data by produceState<AppUiData?>(
+        initialValue = null,
+        dataVersion,
+        inventoryType,
+        historyFilter
+    ) {
+        value = withContext(Dispatchers.IO) {
+            val today = DateUtils.todayDate()
+            AppUiData(
+                today = today,
+                metrics = repository.getDashboardMetrics(today),
+                activePens = repository.getActivePens(inventoryType, today),
+                historyEvents = repository.getAllHistory(historyFilter),
+                settings = repository.getNotificationSettings()
+            )
+        }
+    }
 
     // Sub-screen 1: Add Pen
     if (isAddPenOpen) {
         AddPenScreen(
             onNavigateBack = { isAddPenOpen = false },
-            onSavePens = { name, type, expiry, count, onSuccess ->
-                try {
-                    val ids = repository.addPens(name, type, expiry, count, DateUtils.todayDate())
-                    dataVersion++
-                    onSuccess()
-                } catch (e: Exception) {
-                    // Handled in screen
+            onSavePens = { name, type, expiry, count, onSuccess, onError ->
+                scope.launch(Dispatchers.IO) {
+                    val result = runCatching {
+                        repository.addPens(name, type, expiry, count, DateUtils.todayDate())
+                    }
+                    if (result.isSuccess) dataVersion++
+                    withContext(Dispatchers.Main) {
+                        result.fold(
+                            onSuccess = { onSuccess() },
+                            onFailure = { onError(it.message ?: "خطا در ثبت قلم‌ها") }
+                        )
+                    }
                 }
             }
         )
@@ -131,29 +177,73 @@ fun AppContent(
 
     // Sub-screen 2: Pen Details
     if (selectedPenId != null) {
-        val pen = remember(dataVersion, selectedPenId) { repository.getPenById(selectedPenId) }
-        val penHistory = remember(dataVersion, selectedPenId) { repository.getPenHistory(selectedPenId) }
+        val pen by produceState<InsulinPen?>(initialValue = null, dataVersion, selectedPenId) {
+            value = withContext(Dispatchers.IO) { repository.getPenById(selectedPenId) }
+        }
+        val penHistory by produceState(initialValue = emptyList<HistoryEvent>(), dataVersion, selectedPenId) {
+            value = withContext(Dispatchers.IO) { repository.getPenHistory(selectedPenId) }
+        }
 
         PenDetailsScreen(
             pen = pen,
             historyEvents = penHistory,
             onNavigateBack = { selectedPenId = null },
             onUpdatePen = { newName, newType, newExpiry ->
-                repository.updatePen(selectedPenId!!, newName, newType, newExpiry, DateUtils.todayDate())
-                dataVersion++
+                scope.launch(Dispatchers.IO) {
+                    val result = runCatching {
+                        repository.updatePen(selectedPenId ?: return@launch, newName, newType, newExpiry, DateUtils.todayDate())
+                    }
+                    if (result.isSuccess) {
+                        dataVersion++
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "خطا در ذخیره ویرایش: ${result.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
             },
             onMarkOpened = { openedDate ->
-                repository.markPenAsOpened(selectedPenId!!, openedDate, DateUtils.todayDate())
-                dataVersion++
+                scope.launch(Dispatchers.IO) {
+                    val result = runCatching {
+                        repository.markPenAsOpened(selectedPenId ?: return@launch, openedDate, DateUtils.todayDate())
+                    }
+                    if (result.isSuccess) {
+                        dataVersion++
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "خطا در ثبت باز شدن: ${result.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
             },
             onMarkDefective = { reason ->
-                repository.markPenAsDefective(selectedPenId!!, reason, DateUtils.todayDate())
-                dataVersion++
+                scope.launch(Dispatchers.IO) {
+                    val result = runCatching {
+                        repository.markPenAsDefective(selectedPenId ?: return@launch, reason, DateUtils.todayDate())
+                    }
+                    if (result.isSuccess) {
+                        dataVersion++
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "خطا در ثبت خرابی: ${result.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
             },
             onDeletePen = {
-                repository.deletePenPermanently(selectedPenId!!)
-                dataVersion++
-                selectedPenId = null
+                scope.launch(Dispatchers.IO) {
+                    val result = runCatching {
+                        repository.deletePenPermanently(selectedPenId ?: return@launch)
+                    }
+                    if (result.isSuccess) {
+                        dataVersion++
+                        withContext(Dispatchers.Main) { selectedPenId = null }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "خطا در حذف قلم: ${result.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
             }
         )
         return
@@ -161,12 +251,23 @@ fun AppContent(
 
     // Sub-screen 3: Expired Pens
     if (isExpiredPensOpen) {
-        val expiredPens = remember(dataVersion) { repository.getExpiredPens() }
+        val expiredPens by produceState(initialValue = emptyList<InsulinPen>(), dataVersion) {
+            value = withContext(Dispatchers.IO) { repository.getExpiredPens() }
+        }
         ExpiredPensScreen(
             pens = expiredPens,
             onNavigateBack = { isExpiredPensOpen = false },
             onPenSelected = { pen -> selectedPenId = pen.id }
         )
+        return
+    }
+
+    // Main Tabs — wait for the first background load to finish.
+    val uiData = data
+    if (uiData == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = PrimaryBlue)
+        }
         return
     }
 
@@ -247,7 +348,7 @@ fun AppContent(
             when (currentTab) {
                 NavigationTab.DASHBOARD -> {
                     DashboardScreen(
-                        metrics = metrics,
+                        metrics = uiData.metrics,
                         onNavigateToInventory = { type ->
                             inventoryType = type
                             currentTab = NavigationTab.INVENTORY
@@ -259,7 +360,7 @@ fun AppContent(
                 NavigationTab.INVENTORY -> {
                     InventoryScreen(
                         currentType = inventoryType,
-                        pens = activePens,
+                        pens = uiData.activePens,
                         onTypeSelected = { inventoryType = it },
                         onPenSelected = { selectedPenId = it.id },
                         onNavigateToAddPen = { isAddPenOpen = true }
@@ -267,7 +368,7 @@ fun AppContent(
                 }
                 NavigationTab.HISTORY -> {
                     HistoryScreen(
-                        events = historyEvents,
+                        events = uiData.historyEvents,
                         selectedFilter = historyFilter,
                         onFilterSelected = { historyFilter = it },
                         onEventClicked = { selectedPenId = it }
@@ -275,13 +376,18 @@ fun AppContent(
                 }
                 NavigationTab.SETTINGS -> {
                     SettingsScreen(
-                        settings = settings,
+                        settings = uiData.settings,
                         onSettingsChanged = { newSettings ->
-                            repository.saveNotificationSettings(newSettings)
-                            dataVersion++
+                            scope.launch(Dispatchers.IO) {
+                                repository.saveNotificationSettings(newSettings)
+                                dataVersion++
+                            }
                         },
                         onExportBackup = { repository.exportBackupJson() },
                         onRestoreBackup = { json ->
+                            // Intentionally synchronous: SettingsScreen relies on
+                            // exceptions to show a failure toast, and restore is
+                            // a rare, user-confirmed operation.
                             repository.restoreFromJson(json)
                             dataVersion++
                         }

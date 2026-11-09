@@ -57,6 +57,7 @@
     <string name="err_invalid_type">لطفاً نوع اثر (بلنداثر یا کوتاه‌اثر) را انتخاب فرمایید.</string>
     <string name="err_invalid_date">لطفاً تاریخ انقضای معتبر با قالب YYYY-MM-DD وارد نمایید.</string>
     <string name="err_invalid_count">تعداد قلم‌ها باید یک عدد صحیح بزرگ‌تر از صفر باشد.</string>
+    <string name="err_count_too_large">حداکثر 100 قلم در هر ثبت امکان‌پذیر است.</string>
 
     <!-- Pen Details -->
     <string name="pen_details_title">جزئیات قلم انسولین</string>
