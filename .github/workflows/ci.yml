@@ -1,0 +1,50 @@
+name: CI
+
+# CI runs only after a pull request targeting main, and only when
+# source code, resources, build files, or workflows change.
+# Documentation-only changes are skipped via paths-ignore.
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "README.md"
+      - ".github/README.md"
+      - "AGENTS.md"
+      - "CHANGELOG.md"
+      - "RELEASES.md"
+      - "SECURITY.md"
+      - "LICENSE"
+      - ".gitattributes"
+      - ".editorconfig"
+      - ".github/ISSUE_TEMPLATE/**"
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # Gradle 8.7 is installed explicitly because the repository does not
+      # carry a Gradle wrapper yet (see RELEASES.md / audit notes).
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      - name: Run unit tests
+        run: gradle testDebugUnitTest --no-daemon
+
+      - name: Build debug APK
+        run: gradle assembleDebug --no-daemon
