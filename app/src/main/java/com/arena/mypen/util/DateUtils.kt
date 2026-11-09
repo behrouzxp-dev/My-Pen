@@ -10,17 +10,20 @@ import java.util.regex.Pattern
 object DateUtils {
 
     private val DATE_PATTERN = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$")
-    private val UTC = TimeZone.getTimeZone("UTC")
+
+    // Use the device's local timezone so that "today" matches the user's calendar day.
+    private val LOCAL: TimeZone
+        get() = TimeZone.getDefault()
 
     fun todayDate(): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        sdf.timeZone = UTC
+        sdf.timeZone = LOCAL
         return sdf.format(Date())
     }
 
     fun currentDateTime(): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
-        sdf.timeZone = UTC
+        sdf.timeZone = LOCAL
         return sdf.format(Date())
     }
 
@@ -86,7 +89,7 @@ object DateUtils {
             val month = parts[1].toInt()
             val day = parts[2].toInt()
 
-            val cal = Calendar.getInstance(UTC, Locale.US).apply {
+            val cal = Calendar.getInstance(LOCAL, Locale.US).apply {
                 set(Calendar.YEAR, year)
                 set(Calendar.MONTH, month - 1)
                 set(Calendar.DAY_OF_MONTH, day)
@@ -98,7 +101,7 @@ object DateUtils {
             }
 
             val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-            sdf.timeZone = UTC
+            sdf.timeZone = LOCAL
             sdf.format(cal.time)
         } catch (e: Exception) {
             dateStr
