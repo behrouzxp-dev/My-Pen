@@ -29,18 +29,21 @@ jobs:
         with:
           gradle-version: "8.7"
 
+      # GitHub secrets are configured in the repository with the names below
+      # (the maintainers created them without a MYPEN_ prefix). They are mapped
+      # onto the MYPEN_* environment variables that gradle expects.
       - name: Verify signing secrets are present
         env:
-          MYPEN_KEYSTORE_BASE64: ${{ secrets.MYPEN_KEYSTORE_BASE64 }}
-          MYPEN_STORE_PASSWORD: ${{ secrets.MYPEN_STORE_PASSWORD }}
-          MYPEN_KEY_ALIAS: ${{ secrets.MYPEN_KEY_ALIAS }}
-          MYPEN_KEY_PASSWORD: ${{ secrets.MYPEN_KEY_PASSWORD }}
+          Keystore_base64: ${{ secrets.Keystore_base64 }}
+          Keystore_password: ${{ secrets.Keystore_password }}
+          Key_alias: ${{ secrets.Key_alias }}
+          Key_password: ${{ secrets.Key_password }}
         run: |
           set -euo pipefail
           missing=0
-          for name in MYPEN_KEYSTORE_BASE64 MYPEN_STORE_PASSWORD MYPEN_KEY_ALIAS MYPEN_KEY_PASSWORD; do
+          for name in Keystore_base64 Keystore_password Key_alias Key_password; do
             if [ -z "${!name}" ]; then
-              echo "::error::Required signing secret $name is not set."
+              echo "::error::Required repository secret '$name' is not set or is empty."
               missing=1
             fi
           done
@@ -48,18 +51,18 @@ jobs:
 
       - name: Decode the release keystore
         env:
-          MYPEN_KEYSTORE_BASE64: ${{ secrets.MYPEN_KEYSTORE_BASE64 }}
+          Keystore_base64: ${{ secrets.Keystore_base64 }}
         run: |
           set -euo pipefail
-          printf '%s' "$MYPEN_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/mypen-release.jks"
+          printf '%s' "$Keystore_base64" | base64 --decode > "$RUNNER_TEMP/mypen-release.jks"
           chmod 600 "$RUNNER_TEMP/mypen-release.jks"
 
       - name: Build the release APK
         env:
           MYPEN_KEYSTORE_PATH: ${{ runner.temp }}/mypen-release.jks
-          MYPEN_STORE_PASSWORD: ${{ secrets.MYPEN_STORE_PASSWORD }}
-          MYPEN_KEY_ALIAS: ${{ secrets.MYPEN_KEY_ALIAS }}
-          MYPEN_KEY_PASSWORD: ${{ secrets.MYPEN_KEY_PASSWORD }}
+          MYPEN_STORE_PASSWORD: ${{ secrets.Keystore_password }}
+          MYPEN_KEY_ALIAS: ${{ secrets.Key_alias }}
+          MYPEN_KEY_PASSWORD: ${{ secrets.Key_password }}
         run: gradle assembleRelease --no-daemon
 
       - name: Rename the APK and compute its checksum
