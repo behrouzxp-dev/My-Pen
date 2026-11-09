@@ -77,10 +77,10 @@ and intentionally independent of `versionName`.
 
 ## Release history
 
-- **v1.0.0** — baseline import; the application ID was changed from
-  `com.arena.mypen` to `com.mypen.app` before the first stable release
-  (versionCode remains 1000). No GitHub Release has been published yet; the first
-  tag will be the owner's choice (`tag` workflow).
+- **v1.0.0** — first stable release (2026-11-09). applicationId
+  `com.mypen.app` (renamed from `com.arena.mypen` before the first stable
+  release); versionCode 1000. Published directly by `release.yml` as
+  `My Pen V1.0.0.apk` with its SHA-256 checksum.
 
 ## Notes
 
